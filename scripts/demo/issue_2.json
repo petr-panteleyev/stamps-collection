@@ -1,0 +1,65 @@
+{
+  "region": "СССР",
+  "date": "1984-10-10",
+  "title": "25 лет космическому телевидению.",
+  "stamps": [
+    {
+      "numberZag": 5490,
+      "denomination": 0.05,
+      "description": "Полет станции \"Луна-3\"",
+      "hasClean": false,
+      "hasCancelled": false,
+      "replacementRequired": false,
+      "tags": [
+        "Космос"
+      ]
+    },
+    {
+      "numberZag": 5491,
+      "denomination": 0.20,
+      "description": "Полет АМС \"Венера-9\"",
+      "hasClean": false,
+      "hasCancelled": false,
+      "replacementRequired": false,
+      "tags": [
+        "Космос"
+      ]
+    },
+    {
+      "numberZag": 5492,
+      "denomination": 0.45,
+      "description": "Спутник \"Метеор\" в полете",
+      "hasClean": false,
+      "hasCancelled": false,
+      "replacementRequired": false,
+      "tags": [
+        "Космос"
+      ]
+    }
+  ],
+  "blocks": [
+    {
+      "numberZag": 179,
+      "description": "string",
+      "hasClean": false,
+      "hasCancelled": false,
+      "replacementRequired": false,
+      "stamps": [
+        {
+          "numberZag": 5493,
+          "denomination": 0.50,
+          "description": "Космонавт на станции \"Салют-7\"",
+          "hasClean": false,
+          "hasCancelled": false,
+          "replacementRequired": false,
+          "tags": [
+            "Космос"
+          ]
+        }
+      ],
+      "tags": [
+        "Космос"
+      ]
+    }
+  ]
+}

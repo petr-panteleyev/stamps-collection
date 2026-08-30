@@ -1,0 +1,87 @@
+openapi: "3.0.0"
+
+info:
+  title: Images
+  version: 1.0.0
+
+paths:
+  /api/v1/images:
+    post:
+      tags:
+        - 'images, v1'
+      summary: 'Upload an image'
+      operationId: postImage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageUploadDTO'
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageUploadResponseDto'
+
+  /api/v1/images/{id}/binary:
+    get:
+      tags:
+        - "images, v1"
+      summary: 'Get image bytes'
+      operationId: getImageBytes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: 'Image response'
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+
+components:
+  schemas:
+
+    ImageUploadDTO:
+      type: object
+      description: 'Image for stamps, blocks and couplings'
+      required:
+        - region
+        - numberZag
+        - image
+      properties:
+        region:
+          type: string
+          description: 'Region of stamp issue'
+        numberZag:
+          type: integer
+          description: 'Number from catalogue by V. Zagorsky'
+        isBlock:
+          type: boolean
+          description: 'If this image is for block'
+        image:
+          type: string
+          description: 'Image bytes encoded in Base64'
+
+    ImageUploadResponseDto:
+      type: object
+      description: 'Response for image upload request'
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 'ID of uploaded image (new or existing)'

@@ -1,0 +1,118 @@
+openapi: '3.0.0'
+
+info:
+  title: Blocks
+  version: 1.0.0
+
+paths:
+  /api/v1/blocks/{id}:
+    get:
+      tags:
+        - 'blocks, v1'
+      summary: 'Get the block'
+      operationId: getBlock
+      parameters:
+        - name: id
+          description: 'ID of the block'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDTO'
+        "404":
+          description: 'Not found'
+          content:
+            application/json:
+              schema:
+                $ref: './objects.yml#/components/schemas/ErrorDTO'
+
+    patch:
+      tags:
+        - 'blocks, v1'
+      summary: 'Patch the block'
+      operationId: patchBlock
+      parameters:
+        - name: id
+          description: 'ID of the block'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './objects.yml#/components/schemas/ItemPatchDTO'
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlockDTO'
+        "404":
+          description: 'Not found'
+          content:
+            application/json:
+              schema:
+                $ref: './objects.yml#/components/schemas/ErrorDTO'
+
+components:
+  schemas:
+
+    BlockDTO:
+      type: object
+      description: 'Postal block'
+      required:
+        - numberZag
+        - description
+        - hasClean
+        - hasCancelled
+        - replacementRequired
+        - stamps
+        - tags
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Первичный ключ
+        numberZag:
+          type: integer
+          description: 'Number from catalogue by V. Zagorsky'
+        numberCfa:
+          type: integer
+          description: 'Number from USSR official catalogue'
+        description:
+          type: string
+          description: 'Block description'
+        hasClean:
+          type: boolean
+          description: 'Clean stamp is present in the collection'
+        hasCancelled:
+          type: boolean
+          description: 'Cancelled stamp is present in the collection'
+        replacementRequired:
+          type: boolean
+          description: 'Replacement required: damaged, etc.'
+        comment:
+          type: string
+          description: 'Comment'
+        stamps:
+          type: array
+          description: 'Stamps in this block'
+          items:
+            $ref: './stamps.yml#/components/schemas/StampDTO'
+        tags:
+          type: array
+          description: 'Block tags'
+          items:
+            type: string

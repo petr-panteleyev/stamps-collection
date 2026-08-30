@@ -1,0 +1,132 @@
+openapi: "3.0.0"
+
+info:
+  title: Issues
+  version: 1.0.0
+
+paths:
+  /api/v1/issues:
+    get:
+      tags:
+        - 'issues, v1'
+      summary: 'Get the list of postage stamp issues'
+      operationId: getIssues
+      parameters:
+        - name: region
+          description: 'Region'
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: yearStart
+          description: 'Year range start (inclusive)'
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: yearEnd
+          description: 'Year rage end (inclusive)'
+          in: query
+          required: true
+          schema:
+            type: integer
+        - name: tags
+          description: 'Comma separated list of tags'
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/IssueDTO'
+
+    post:
+      tags:
+        - 'issues, v1'
+      summary: 'Upload a postal stamps issue'
+      operationId: postIssue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueDTO'
+      responses:
+        "204":
+          description: 'Success'
+
+  /api/v1/issues/{id}:
+    put:
+      tags:
+        - 'issues, v1'
+      summary: 'Upload a postal stamps issue'
+      operationId: putIssue
+      parameters:
+        - name: id
+          description: 'ID of the issue'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueDTO'
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/IssueDTO'
+
+components:
+  schemas:
+
+    IssueDTO:
+      type: object
+      description: Issue of postal stamps, blocks, couplings
+      required:
+        - title
+        - region
+        - date
+        - stamps
+        - blocks
+        - couplings
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 'Primary key'
+        region:
+          type: string
+          description: 'Issue region'
+        date:
+          type: string
+          format: date
+          description: 'Issue date'
+        title:
+          type: string
+          description: 'Issue title'
+        stamps:
+          type: array
+          items:
+            $ref: './stamps.yml#/components/schemas/StampDTO'
+        blocks:
+          type: array
+          items:
+            $ref: './blocks.yml#/components/schemas/BlockDTO'
+        couplings:
+          type: array
+          items:
+            $ref: './couplings.yml#/components/schemas/CouplingDTO'

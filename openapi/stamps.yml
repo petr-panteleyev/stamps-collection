@@ -1,0 +1,115 @@
+openapi: '3.0.0'
+
+info:
+  title: Stamps
+  version: 1.0.0
+
+paths:
+  /api/v1/stamps/{id}:
+    get:
+      tags:
+        - 'stamps, v1'
+      summary: 'Get the stamp'
+      operationId: getStamp
+      parameters:
+        - name: id
+          description: 'ID of the stamp'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StampDTO'
+        "404":
+          description: 'Not found'
+          content:
+            application/json:
+              schema:
+                $ref: './objects.yml#/components/schemas/ErrorDTO'
+
+    patch:
+      tags:
+        - 'stamps, v1'
+      summary: 'Patch the stamp'
+      operationId: patchStamp
+      parameters:
+        - name: id
+          description: 'ID of the stamp'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './objects.yml#/components/schemas/ItemPatchDTO'
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StampDTO'
+        "404":
+          description: 'Not found'
+          content:
+            application/json:
+              schema:
+                $ref: './objects.yml#/components/schemas/ErrorDTO'
+
+components:
+  schemas:
+    StampDTO:
+      type: object
+      description: 'Postal stamp'
+      required:
+        - numberZag
+        - denomination
+        - description
+        - hasClean
+        - hasCancelled
+        - replacementRequired
+        - tags
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 'Primary key'
+        numberZag:
+          type: integer
+          description: 'Number from catalogue by V. Zagorsky'
+        numberCfa:
+          type: integer
+          description: 'Number from USSR official catalogue'
+        denomination:
+          type: number
+          description: 'Denomination in region currency'
+        description:
+          type: string
+          description: 'Stamp description'
+        hasClean:
+          type: boolean
+          description: 'Clean stamp is present in the collection'
+        hasCancelled:
+          type: boolean
+          description: 'Cancelled stamp is present in the collection'
+        replacementRequired:
+          type: boolean
+          description: 'Replacement required: damaged, etc.'
+        comment:
+          type: string
+          description: 'Comment'
+        tags:
+          type: array
+          description: 'Stamp tags'
+          items:
+            type: string

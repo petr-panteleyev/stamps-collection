@@ -1,0 +1,51 @@
+openapi: '3.0.0'
+
+info:
+  title: Objects
+  version: 1.0.0
+
+servers: []
+paths: []
+
+components:
+  schemas:
+    ItemPatchDTO:
+      type: object
+      description: 'Patch for stamp, block or coupling'
+      properties:
+        hasClean:
+          type: boolean
+          description: 'Clean item is present in the collection'
+        hasCancelled:
+          type: boolean
+          description: 'Cancelled item is present in the collection'
+        replacementRequired:
+          type: boolean
+          description: 'Replacement required: damaged, etc.'
+
+    ErrorDTO:
+      type: object
+      description: 'Error message'
+      required:
+        - code
+        - error
+        - path
+        - timestamp
+      properties:
+        code:
+          type: integer
+          description: 'Error code'
+          nullable: false
+        error:
+          type: string
+          description: 'Error message'
+          nullable: false
+        path:
+          type: string
+          description: 'Request path'
+          nullable: false
+        timestamp:
+          type: string
+          format: date-time
+          description: 'Timestamp of the response'
+          nullable: false

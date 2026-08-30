@@ -1,0 +1,126 @@
+openapi: "3.0.0"
+
+info:
+  title: Tags
+  version: 1.0.0
+
+paths:
+  /api/v1/tags:
+    get:
+      tags:
+        - "tags, v1"
+      summary: 'Get the list of all tags'
+      operationId: getTags
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TagDTO'
+
+    post:
+      tags:
+        - "tags, v1"
+      summary: 'Create a new tag'
+      operationId: postTag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagDTO'
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagDTO'
+        "400":
+          description: 'Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: './objects.yml#/components/schemas/ErrorDTO'
+        "409":
+          description: 'Conflict'
+          content:
+            application/json:
+              schema:
+                $ref: './objects.yml#/components/schemas/ErrorDTO'
+
+  /api/v1/tags/{id}:
+    get:
+      tags:
+        - "tags, v1"
+      summary: 'Get tag by ID'
+      operationId: getTagById
+      parameters:
+        - name: id
+          description: 'ID of the tag'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagDTO'
+        "404":
+          description: 'Not found'
+          content:
+            application/json:
+              schema:
+                $ref: './objects.yml#/components/schemas/ErrorDTO'
+
+    put:
+      tags:
+        - "tags, v1"
+      summary: 'Update existing tag'
+      operationId: putTag
+      parameters:
+        - name: id
+          description: 'ID of the tag'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagDTO'
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagDTO'
+
+
+components:
+  schemas:
+
+    TagDTO:
+      type: object
+      description: 'Tag for issues, stamps, blocks, etc.'
+      required:
+        - name
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 'Primary key'
+        name:
+          type: string
+          description: 'Tag unique name'

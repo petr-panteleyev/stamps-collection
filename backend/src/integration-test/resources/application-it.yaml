@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:14.12:////test
+    driverClassName: org.testcontainers.jdbc.ContainerDatabaseDriver
+    username: test
+    password: test
+    hikari:
+      schema: public
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true

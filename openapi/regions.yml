@@ -1,0 +1,77 @@
+openapi: '3.0.0'
+
+info:
+  title: Regions
+  version: 1.0.0
+
+paths:
+  /api/v1/regions:
+    get:
+      tags:
+        - 'regions, v1'
+      summary: 'Get the list of all regions'
+      operationId: getRegions
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RegionDTO'
+
+    post:
+      tags:
+        - 'regions, v1'
+      summary: 'Create new region'
+      operationId: postRegion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegionDTO'
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegionDTO'
+        "400":
+          description: 'Bad Request'
+          content:
+            application/json:
+              schema:
+                $ref: './objects.yml#/components/schemas/ErrorDTO'
+        "409":
+          description: 'Conflict'
+          content:
+            application/json:
+              schema:
+                $ref: './objects.yml#/components/schemas/ErrorDTO'
+
+components:
+  schemas:
+
+    RegionDTO:
+      type: object
+      description: 'Region of stamp issue (РСФСР, СССР, Россия, Тува, USA, etc.)'
+      required:
+        - name
+        - yearStart
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 'Primary key'
+        name:
+          type: string
+          description: 'Unique region name'
+        yearStart:
+          type: integer
+          description: 'Start year of stamp issues'
+        yearEnd:
+          type: integer
+          description: 'Final year of stamp issues'

@@ -1,0 +1,50 @@
+{
+  "region": "СССР",
+  "date": "1984-05-08",
+  "title": "За мир и международное сотрудничество.",
+  "stamps": [
+    {
+      "numberZag": 5438,
+      "denomination": 0.05,
+      "description": "Зап. полушарие Земли",
+      "hasClean": false,
+      "hasCancelled": false,
+      "replacementRequired": false,
+      "tags": [
+        "Разное"
+      ]
+    },
+    {
+      "numberZag": 5439,
+      "denomination": 0.05,
+      "description": "Текст",
+      "hasClean": false,
+      "hasCancelled": false,
+      "replacementRequired": false,
+      "tags": [
+        "Разное"
+      ]
+    },
+    {
+      "numberZag": 5440,
+      "denomination": 0.05,
+      "description": "Вост. полушарие Земли ",
+      "hasClean": false,
+      "hasCancelled": false,
+      "replacementRequired": false,
+      "tags": [
+        "Разное"
+      ]
+    }
+  ],
+  "couplings": [
+    {
+      "hasClean": false,
+      "hasCancelled": false,
+      "replacementRequired": false,
+      "stampNumbers": [
+        5438,5439,5440
+      ]
+    }
+  ]
+}

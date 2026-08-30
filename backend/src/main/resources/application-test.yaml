@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    driverClassName: org.postgresql.Driver
+    username: stamps_test
+    password: stamps_test
+    hikari:
+      schema: stamps_test
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 1705
+
+logging:
+  level:
+    root: INFO
+    org.panteleyev: TRACE

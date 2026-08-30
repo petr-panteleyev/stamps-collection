@@ -1,0 +1,308 @@
+<!-- Copyright © 2026 Petr Panteleyev -->
+<!-- SPDX-License-Identifier: BSD-2-Clause -->
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8"/>
+
+    <title>СССР 1986-1991</title>
+    <link rel="stylesheet" href="./main.css"/>
+
+    <script type="application/javascript" src="./js/functions.js"></script>
+</head>
+
+<body>
+
+<!--
+Статус:
+P - марка в наличии в достаточном качестве (чистая, без дефектов)
+R - марка в наличии, требует замены
+-->
+
+<h2>СССР 1986-1991</h2>
+
+<p id="filterButtons"></p>
+
+<table border="0" id="mainTable">
+    <tr>
+        <th>Год.</th>
+        <th>Кат.</th>
+        <th>ЦФА</th>
+        <th>Ном.</th>
+        <th>Описание</th>
+        <th>Ч</th>
+        <th>Г</th>
+        <th>З</th>
+        <th>Комментарий</th>
+    </tr>
+</table>
+
+<script type="application/javascript">
+    const baseUrl = 'http://localhost:1705/stamps/api/v1/'
+    const baseImageUrl = 'http://localhost:1705/stamps/api/v1/images/'
+    const baseStampUrl = 'http://localhost:1705/stamps/api/v1/stamps/'
+    const baseBlockUrl = 'http://localhost:1705/stamps/api/v1/blocks/'
+    const baseCouplingUrl = 'http://localhost:1705/stamps/api/v1/couplings/'
+
+    function getStatus(issue) {
+        let hasClean = false
+        let hasCancelled = false
+
+        for (const stamp of issue.stamps) {
+            if (stamp.hasClean) hasClean = true
+            if (stamp.hasCancelled) hasCancelled = true
+        }
+        for (const block of issue.blocks) {
+            if (block.hasClean) hasClean = true
+            if (block.hasCancelled) hasCancelled = true
+            for (const stamp of block.stamps) {
+                if (stamp.hasClean) hasClean = true
+                if (stamp.hasCancelled) hasCancelled = true
+            }
+        }
+
+        if (hasClean) return "P"
+        if (hasCancelled) return "R"
+        return "M"
+    }
+
+    function createTitleRow(title) {
+        const row = document.createElement("tr")
+
+        const skip = row.insertCell(-1)
+        skip.colSpan = 4
+
+        const cell = row.insertCell(-1)
+        cell.colSpan = 3
+        cell.setAttribute("class", "stampTitle")
+        cell.innerHTML = title
+
+        return row
+    }
+
+    function onCheckBox(id, fieldName, value, type) {
+        const request = `{"${fieldName}" : ${value}}`
+        console.log(request)
+
+        const url = baseUrl + type + '/' + id;
+
+        fetch(url, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: request,
+        }).then(r => r.json())
+            .then(data => {
+                console.log(data)
+            })
+    }
+
+    function createCheckBox(id, value, fieldName, type) {
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.name = 'select';
+        checkbox.value = id;
+        checkbox.checked = value;
+        checkbox.dataset.fieldName = fieldName;
+        checkbox.addEventListener('change', (e) => {
+            onCheckBox(id, fieldName, e.target.checked, type)
+        });
+        return checkbox
+    }
+
+    function createStampRow(stamp, year) {
+        const row = document.createElement("tr")
+
+        if (stamp.hasClean) {
+            row.classList.add('present')
+        } else {
+            if (stamp.replacementRequired || stamp.hasCancelled) {
+                row.classList.add('replace')
+            } else {
+                row.classList.add('missing')
+            }
+        }
+
+        const yearCell = row.insertCell(-1)
+        yearCell.innerHTML = year
+
+        const zagCell = row.insertCell(-1)
+        zagCell.innerHTML = stamp.numberZag
+
+        const cfaCell = row.insertCell(-1)
+        cfaCell.innerHTML = stamp.numberCfa
+
+        const denomincationCell = row.insertCell(-1)
+        denomincationCell.innerHTML = stamp.denomination.toFixed(2).replace(".", ",")
+
+        const descrCell = row.insertCell(-1)
+        descrCell.innerHTML = stamp.description
+
+        const cleanCell = row.insertCell(-1)
+        cleanCell.appendChild(createCheckBox(stamp.id, stamp.hasClean, 'hasClean', 'stamps'))
+
+        const cancelledCell = row.insertCell(-1)
+        cancelledCell.appendChild(createCheckBox(stamp.id, stamp.hasCancelled, 'hasCancelled', 'stamps'))
+
+        const replaceCell = row.insertCell(-1)
+        replaceCell.appendChild(createCheckBox(stamp.id, stamp.replacementRequired, 'replacementRequired', 'stamps'))
+
+        const commentCell = row.insertCell(-1)
+        commentCell.innerHTML = stamp.comment
+
+        return row
+    }
+
+    function createCouplingRow(coupling) {
+        const row = document.createElement("tr")
+
+        if (coupling.hasClean) {
+            row.classList.add('present')
+        } else {
+            if (coupling.replacementRequired || coupling.hasCancelled) {
+                row.classList.add('replace')
+            } else {
+                row.classList.add('missing')
+            }
+        }
+
+        const skip = row.insertCell(-1)
+        skip.colSpan = 4
+
+        const title = row.insertCell(-1)
+        title.innerHTML = `Сцепка марок ${coupling.stampNumbers[0]}-${coupling.stampNumbers.at(-1)}`
+
+        const cleanCell = row.insertCell(-1)
+        cleanCell.appendChild(createCheckBox(coupling.id, coupling.hasClean, 'hasClean', 'couplings'))
+
+        const cancelledCell = row.insertCell(-1)
+        cancelledCell.appendChild(createCheckBox(coupling.id, coupling.hasCancelled, 'hasCancelled', 'couplings'))
+
+        const replaceCell = row.insertCell(-1)
+        replaceCell.appendChild(createCheckBox(coupling.id, coupling.replacementRequired, 'replacementRequired', 'couplings'))
+
+        const commentCell = row.insertCell(-1)
+        commentCell.innerHTML = coupling.comment
+
+        return row
+    }
+
+    function createBlockRow(block, year) {
+        const row = document.createElement("tr")
+
+        if (block.hasClean) {
+            row.classList.add('present')
+        } else {
+            if (block.replacementRequired || block.hasCancelled) {
+                row.classList.add('replace')
+            } else {
+                row.classList.add('missing')
+            }
+        }
+
+        const yearCell = row.insertCell(-1)
+        yearCell.innerHTML = year
+
+        const zagCell = row.insertCell(-1)
+        zagCell.innerHTML = 'Бл ' + block.numberZag
+
+        const cfaCell = row.insertCell(-1)
+        cfaCell.innerHTML = block.numberCfa
+
+        const denomincationCell = row.insertCell(-1)
+        denomincationCell.innerHTML = '-'
+
+        const descrCell = row.insertCell(-1)
+        descrCell.innerHTML = block.description
+
+        const cleanCell = row.insertCell(-1)
+        cleanCell.appendChild(createCheckBox(block.id, block.hasClean, 'hasClean', 'blocks'))
+
+        const cancelledCell = row.insertCell(-1)
+        cancelledCell.appendChild(createCheckBox(block.id, block.hasCancelled, 'hasCancelled', 'blocks'))
+
+        const replaceCell = row.insertCell(-1)
+        replaceCell.appendChild(createCheckBox(block.id, block.replacementRequired, 'replacementRequired', 'blocks'))
+
+        const commentCell = row.insertCell(-1)
+        commentCell.innerHTML = block.comment
+
+        return row
+    }
+
+    function createStampImagesRow(stamps) {
+        const row = document.createElement("tr")
+
+        const skip = row.insertCell(-1)
+        skip.colSpan = 4
+
+        const cell = row.insertCell(-1)
+        cell.colSpan = 2
+
+        for (const stamp of stamps) {
+            const img = document.createElement("img")
+            img.setAttribute("class", "stampImage")
+            img.setAttribute("src", baseImageUrl + stamp.id + '/binary')
+            img.setAttribute("alt", stamp.numberZag)
+            cell.appendChild(img)
+        }
+
+        return row
+    }
+
+    function createBlockImagesRow(block) {
+        const row = document.createElement("tr")
+
+        const skip = row.insertCell(-1)
+        skip.colSpan = 4
+
+        const cell = row.insertCell(-1)
+        cell.colSpan = 2
+
+        const img = document.createElement("img")
+        img.setAttribute("class", "blockImage")
+        img.setAttribute("src", baseImageUrl + block.id + '/binary')
+        img.setAttribute("alt", `BL${block.numberZag}`)
+        cell.appendChild(img)
+
+        return row
+    }
+
+    fetch("http://localhost:1705/stamps/api/v1/issues?region=%D0%A1%D0%A1%D0%A1%D0%A0&yearStart=1919&yearEnd=1991")
+        .then(r => r.json())
+        .then(data => {
+            const table = document.getElementById("mainTable")
+            for (const issue of data) {
+                const status = getStatus(issue)
+
+                const titleRow = createTitleRow(issue.title)
+                table.appendChild(titleRow)
+
+                const year = new Date(issue.date).getFullYear()
+
+                for (const stamp of issue.stamps) {
+                    table.appendChild(createStampRow(stamp, year))
+                }
+
+                const stampImagesRow = createStampImagesRow(issue.stamps)
+                table.appendChild(stampImagesRow)
+
+                for (const coupling of issue.couplings) {
+                    table.appendChild(createCouplingRow(coupling))
+                }
+
+                for (const block of issue.blocks) {
+                    table.appendChild(createBlockRow(block, year))
+                    table.appendChild(createBlockImagesRow(block))
+                }
+            }
+
+            showButtons()
+        })
+        .catch(err => console.error(err))
+</script>
+
+</body>
+
+</html>

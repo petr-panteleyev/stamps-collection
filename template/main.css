@@ -1,0 +1,38 @@
+.present {
+    background: #BBFCBD;
+}
+
+.replace {
+    background: lightyellow;
+}
+
+.missing {
+    background: #FCC6BB;
+}
+
+.year {
+}
+
+.stampTitle {
+    font-weight: bold;
+}
+
+.stampImage {
+    max-width: 150px;
+    max-height: 150px;
+}
+
+.blockImage {
+    max-width: 300px;
+    max-height: 300px;
+}
+
+.couplingImage {
+    max-width: 300px;
+    max-height: 300px;
+}
+
+
+tr {
+    vertical-align: top;
+}

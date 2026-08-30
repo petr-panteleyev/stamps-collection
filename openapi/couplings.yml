@@ -1,0 +1,102 @@
+openapi: '3.0.0'
+
+info:
+  title: Couplings
+  version: 1.0.0
+
+paths:
+  /api/v1/couplings/{id}:
+    get:
+      tags:
+        - 'couplings, v1'
+      summary: 'Get the coupling'
+      operationId: getCoupling
+      parameters:
+        - name: id
+          description: 'ID of the coupling'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CouplingDTO'
+        "404":
+          description: 'Not found'
+          content:
+            application/json:
+              schema:
+                $ref: './objects.yml#/components/schemas/ErrorDTO'
+
+    patch:
+      tags:
+        - 'couplings, v1'
+      summary: 'Patch the coupling'
+      operationId: patchCoupling
+      parameters:
+        - name: id
+          description: 'ID of the coupling'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: './objects.yml#/components/schemas/ItemPatchDTO'
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CouplingDTO'
+        "404":
+          description: 'Not found'
+          content:
+            application/json:
+              schema:
+                $ref: './objects.yml#/components/schemas/ErrorDTO'
+
+components:
+  schemas:
+
+    CouplingDTO:
+      type: object
+      description: 'Coupling'
+      required:
+        - stamps
+        - hasClean
+        - hasCancelled
+        - replacementRequired
+        - stampNumbers
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 'Primary key'
+        hasClean:
+          type: boolean
+          description: 'Clean coupling is present in the collection'
+        hasCancelled:
+          type: boolean
+          description: 'Cancelled coupling is present in the collection'
+        replacementRequired:
+          type: boolean
+          description: 'Replacement required: damaged, etc.'
+        comment:
+          type: string
+          description: 'Comment'
+        stampNumbers:
+          type: array
+          description: 'Stamp numbers in this coupling'
+          items:
+            type: integer
