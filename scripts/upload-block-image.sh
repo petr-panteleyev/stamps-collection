@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASE_URL="http://localhost:1705/stamps/api/v1/images"
+BASE_URL="http://localhost:1710/stamps/api/v1/images"
 
 if [ $# -ne 3 ]; then
   echo "Usage: $0 <region> <numberZag> <fileName>"

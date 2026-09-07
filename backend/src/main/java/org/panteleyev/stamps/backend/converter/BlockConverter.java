@@ -34,6 +34,7 @@ public class BlockConverter {
         var tags = entity.getTags().stream().map(TagEntity::getName).toList();
         return new BlockDTO()
                 .id(entity.getId())
+                .year(entity.getYear())
                 .numberZag(entity.getNumberZag())
                 .numberCfa(entity.getNumberCfa())
                 .description(entity.getDescription())

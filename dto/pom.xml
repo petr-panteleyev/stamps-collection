@@ -91,6 +91,10 @@
                                 <serializationLibrary>jackson</serializationLibrary>
                                 <useJspecify>true</useJspecify>
                             </configOptions>
+
+                            <openapiNormalizer>
+                                REF_AS_PARENT_IN_ALLOF=true
+                            </openapiNormalizer>
                         </configuration>
                     </execution>
                 </executions>

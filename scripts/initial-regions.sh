@@ -8,7 +8,7 @@ curl -X 'POST' \
   -H 'Content-Type: application/json' \
   -d '{
   "name": "СССР",
-  "yearStart": 1918,
+  "yearStart": 1923,
   "yearEnd": 1991
 }'
 

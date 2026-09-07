@@ -3,6 +3,9 @@
 package org.panteleyev.stamps.backend.service;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.panteleyev.stamps.backend.BaseSpringBootTest;
 import org.panteleyev.stamps.dto.BlockDTO;
 import org.panteleyev.stamps.dto.CouplingDTO;
@@ -17,12 +20,43 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.params.provider.Arguments.argumentSet;
 import static org.panteleyev.stamps.backend.converter.ConverterUtils.convertBoolean;
 
 public class IssueServiceIT extends BaseSpringBootTest {
+    private static final UUID USSR_ISSUE_UUID = UUID.fromString("89924614-c4a0-4eaf-9d4a-6be398761899");
+    private static final UUID RUSSIA_ISSUE_UUID = UUID.fromString("ef41db10-b38e-4a85-94c6-5cf8f83c9ff6");
 
     @Autowired
     private IssueService service;
+
+    private static List<Arguments> testGetIssuesArguments() {
+        return List.of(
+                argumentSet("Region and years range",
+                    "СССР", 1918, 1991, List.of(USSR_ISSUE_UUID)
+                ),
+                argumentSet("Region and years range",
+                    "Россия", 1992, 2026, List.of(RUSSIA_ISSUE_UUID)
+                ),
+                argumentSet("All regions and years range",
+                    null, 1918, 2026, List.of(USSR_ISSUE_UUID, RUSSIA_ISSUE_UUID)
+                ),
+                argumentSet("All regions and all years",
+                    null, null, null, List.of(USSR_ISSUE_UUID, RUSSIA_ISSUE_UUID)
+                )
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("testGetIssuesArguments")
+    @Sql("/sql/initRegions.sql")
+    @Sql("/sql/initTags.sql")
+    @Sql("/sql/IssueServiceIT/testGetIssues.sql")
+    public void testGetIssues(String region, Integer startYear, Integer endYear, List<UUID> expected) {
+        var actual = service.getIssues(region, startYear, endYear, null);
+        assertThat(actual).hasSize(expected.size());
+        assertThat(actual.stream().map(IssueDTO::getId)).containsExactlyInAnyOrderElementsOf(expected);
+    }
 
     @Test
     @Sql("/sql/initRegions.sql")

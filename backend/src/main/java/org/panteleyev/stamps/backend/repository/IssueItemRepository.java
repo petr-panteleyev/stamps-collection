@@ -2,45 +2,25 @@
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.stamps.backend.repository;
 
+import org.jspecify.annotations.NullMarked;
 import org.panteleyev.stamps.backend.domain.IssueItemEntity;
 import org.panteleyev.stamps.dto.ItemPatchDTO;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Set;
+import java.util.List;
 import java.util.UUID;
-import java.util.stream.Stream;
 
-public interface IssueItemRepository extends JpaRepository<IssueItemEntity, UUID> {
-    @Query("""
-                SELECT DISTINCT i FROM IssueItem i
-                WHERE i.issue.region.name = :region
-                    AND i.year BETWEEN :yearStart AND :yearEnd
-            """)
-    Stream<IssueItemEntity> findByRegionAndYearBetween(String region, int yearStart, int yearEnd);
-
-    @Query("""
-                SELECT DISTINCT i FROM IssueItem i
-                    LEFT JOIN FETCH i.tags t
-                WHERE i.issue.region.name = :region
-                    AND i.year BETWEEN :yearStart AND :yearEnd
-                    AND t.name IN :tagNames
-            """)
-    Stream<IssueItemEntity> findByRegionAndYearBetweenWithTags(String region, int yearStart, int yearEnd,
-            Set<String> tagNames);
-
-    @Query("""
-            SELECT i FROM IssueItem i
-                JOIN i.issue iss
-            WHERE i.numberZag = :numberZag
-                AND iss.region.name = :region
-            """)
-    Stream<IssueItemEntity> findByRegionAndNumberZag(String region, Integer numberZag);
-
-    @Query("SELECT i FROM IssueItem i JOIN i.issue iss WHERE iss.id = :id")
-    Stream<IssueItemEntity> findByIssueId(UUID id);
+public interface IssueItemRepository extends JpaRepository<IssueItemEntity, UUID>, JpaSpecificationExecutor<IssueItemEntity> {
+    @Override
+    @NullMarked
+    @EntityGraph(attributePaths = {"issue", "tags", "issue.region"})
+    List<IssueItemEntity> findAll(Specification<IssueItemEntity> spec);
 
     @Query(value = """
             UPDATE issue_item SET

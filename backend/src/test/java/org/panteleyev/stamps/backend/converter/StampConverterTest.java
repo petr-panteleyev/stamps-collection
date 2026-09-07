@@ -95,6 +95,7 @@ public class StampConverterTest {
                         new IssueItemEntity()
                                 .setId(ISSUE_ITEM_ENTITY_ID)
                                 .setType(IssueItemType.STAMP)
+                                .setYear(2026)
                                 .setNumberZag(1000)
                                 .setNumberCfa(2000)
                                 .setYear(2026)
@@ -104,9 +105,11 @@ public class StampConverterTest {
                                 .setHasCancelled(true)
                                 .setHasClean(true)
                                 .setReplacementRequired(true)
+                                .setBlockNumber(3000)
                                 .setTags(Set.of(TAG_1, TAG_3)),
                         new StampDTO()
                                 .id(ISSUE_ITEM_ENTITY_ID)
+                                .year(2026)
                                 .numberZag(1000)
                                 .numberCfa(2000)
                                 .denomination(BigDecimal.TEN)
@@ -115,6 +118,7 @@ public class StampConverterTest {
                                 .hasCancelled(true)
                                 .hasClean(true)
                                 .replacementRequired(true)
+                                .blockNumber(3000)
                                 .tags(List.of("Tag1", "Tag3"))
                 )
         );

@@ -9,6 +9,7 @@ import org.panteleyev.stamps.backend.repository.IssueItemRepository;
 import org.panteleyev.stamps.dto.ImageUploadDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +17,10 @@ import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
+import static org.panteleyev.stamps.backend.domain.IssueItemSpecifications.hasNumberZag;
+import static org.panteleyev.stamps.backend.domain.IssueItemSpecifications.hasRegion;
 import static org.panteleyev.stamps.backend.domain.IssueItemType.BLOCK;
 import static org.panteleyev.stamps.backend.domain.IssueItemType.STAMP;
 
@@ -36,7 +40,11 @@ public class ImageService {
     public UUID saveImage(ImageUploadDTO dto) {
         var type = Objects.equals(dto.getIsBlock(), true) ? BLOCK : STAMP;
 
-        var item = itemRepository.findByRegionAndNumberZag(dto.getRegion(), dto.getNumberZag())
+        var item = itemRepository.findAll(
+                        Stream.of(hasRegion(dto.getRegion()), hasNumberZag(dto.getNumberZag()))
+                                .reduce(Specification::and)
+                                .orElse(null)
+                ).stream()
                 .filter(i -> i.getType() == type)
                 .findAny()
                 .orElseThrow(EntityNotFoundException::new);

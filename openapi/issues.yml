@@ -15,19 +15,19 @@ paths:
         - name: region
           description: 'Region'
           in: query
-          required: true
+          required: false
           schema:
             type: string
         - name: yearStart
           description: 'Year range start (inclusive)'
           in: query
-          required: true
+          required: false
           schema:
             type: integer
         - name: yearEnd
           description: 'Year rage end (inclusive)'
           in: query
-          required: true
+          required: false
           schema:
             type: integer
         - name: tags
@@ -58,10 +58,32 @@ paths:
             schema:
               $ref: '#/components/schemas/IssueDTO'
       responses:
-        "204":
+        "200":
           description: 'Success'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/IssueDTO'
 
   /api/v1/issues/{id}:
+    delete:
+      tags:
+        - 'issues, v1'
+      summary: 'Delete a postal stamps issue'
+      operationId: deleteIssue
+      parameters:
+        - name: id
+          description: 'ID of the issue'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: 'Success, no content'
+
     put:
       tags:
         - 'issues, v1'

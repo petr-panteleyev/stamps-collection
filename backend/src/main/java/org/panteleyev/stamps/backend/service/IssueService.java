@@ -10,6 +10,7 @@ import org.panteleyev.stamps.backend.repository.IssueRepository;
 import org.panteleyev.stamps.backend.repository.RegionRepository;
 import org.panteleyev.stamps.backend.repository.TagRepository;
 import org.panteleyev.stamps.dto.IssueDTO;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +20,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static org.panteleyev.stamps.backend.domain.IssueItemSpecifications.hasRegion;
+import static org.panteleyev.stamps.backend.domain.IssueItemSpecifications.hasTags;
+import static org.panteleyev.stamps.backend.domain.IssueItemSpecifications.hasYearBetween;
 
 @Service
 public class IssueService {
@@ -40,17 +46,17 @@ public class IssueService {
 
     @Transactional(readOnly = true)
     public List<IssueDTO> getIssues(String region, Integer yearStart, Integer yearEnd, String tags) {
-        List<IssueItemEntity> issueItems;
+        var setOfTags = tags == null ?
+                null :
+                Arrays.stream(tags.split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isBlank())
+                        .collect(Collectors.toSet());
 
-        if (tags != null && !tags.isBlank()) {
-            var setOfTags = Arrays.stream(tags.split(","))
-                    .map(String::trim)
-                    .collect(Collectors.toSet());
-            issueItems = issueItemRepository.findByRegionAndYearBetweenWithTags(region, yearStart, yearEnd, setOfTags)
-                    .toList();
-        } else {
-            issueItems = issueItemRepository.findByRegionAndYearBetween(region, yearStart, yearEnd).toList();
-        }
+        var issueItems = issueItemRepository.findAll(
+                Stream.of(hasRegion(region), hasYearBetween(yearStart, yearEnd), hasTags(setOfTags))
+                        .reduce(Specification::and)
+                        .orElse(null));
 
         var grouped = issueItems.stream()
                 .collect(Collectors.groupingBy(IssueItemEntity::getIssue));
@@ -62,7 +68,7 @@ public class IssueService {
     }
 
     @Transactional
-    public void postIssue(IssueDTO dto) {
+    public IssueDTO postIssue(IssueDTO dto) {
         dto.setId(UUID.randomUUID());
         for (var stamp : dto.getStamps()) {
             stamp.setId(UUID.randomUUID());
@@ -76,7 +82,7 @@ public class IssueService {
         for (var coupling : dto.getCouplings()) {
             coupling.setId(UUID.randomUUID());
         }
-        putIssue(dto);
+        return putIssue(dto);
     }
 
     @Transactional
@@ -97,5 +103,10 @@ public class IssueService {
         var entity = converter.issueDtoToEntity(dto, region, tagEntities);
         repository.save(entity);
         return dto;
+    }
+
+    @Transactional
+    public void deleteIssue(UUID id) {
+        repository.deleteById(id);
     }
 }

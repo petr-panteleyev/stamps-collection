@@ -68,6 +68,12 @@ paths:
 
 components:
   schemas:
+    TestDTO:
+      type: object
+      properties:
+        textField:
+          type: string
+
     StampDTO:
       type: object
       description: 'Postal stamp'
@@ -75,15 +81,13 @@ components:
         - numberZag
         - denomination
         - description
-        - hasClean
-        - hasCancelled
-        - replacementRequired
         - tags
+      allOf:
+        - $ref: './objects.yml#/components/schemas/IssueItemDTO'
       properties:
-        id:
-          type: string
-          format: uuid
-          description: 'Primary key'
+        year:
+          type: integer
+          description: 'Year of stamp issue'
         numberZag:
           type: integer
           description: 'Number from catalogue by V. Zagorsky'
@@ -96,18 +100,9 @@ components:
         description:
           type: string
           description: 'Stamp description'
-        hasClean:
-          type: boolean
-          description: 'Clean stamp is present in the collection'
-        hasCancelled:
-          type: boolean
-          description: 'Cancelled stamp is present in the collection'
-        replacementRequired:
-          type: boolean
-          description: 'Replacement required: damaged, etc.'
-        comment:
-          type: string
-          description: 'Comment'
+        blockNumber:
+          type: integer
+          description: 'numberZag of a block this stamp belongs to, ignored on input'
         tags:
           type: array
           description: 'Stamp tags'

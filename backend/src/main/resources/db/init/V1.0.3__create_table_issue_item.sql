@@ -25,10 +25,3 @@ CREATE TABLE IF NOT EXISTS issue_item (
 
 CREATE INDEX IF NOT EXISTS issue_item_issue_id_idx ON issue_item(issue_id);
 CREATE INDEX IF NOT EXISTS issue_item_year_idx ON issue_item(issue_year);
-
---COMMENT ON TABLE issue IS 'Выпуск почтовых марок';
---COMMENT ON COLUMN issue.id IS 'Первичный ключ';
---COMMENT ON COLUMN issue.region IS 'Регион выпуска';
---COMMENT ON COLUMN issue.issue_year IS 'Год выпуска';
---COMMENT ON COLUMN issue.issue_date IS 'Дата выпуска';
---COMMENT ON COLUMN issue.title IS 'Название выпуска';

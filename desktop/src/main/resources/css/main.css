@@ -1,0 +1,28 @@
+.issue-title {
+    -fx-font-weight: bold;
+    -fx-font-size: large;
+}
+
+.has-clean {
+    -fx-background: #BBFCBD;
+}
+.has-clean:selected {
+    -fx-text-fill: -fx-selection-bar-text;
+    -fx-background: -fx-selection-bar;
+}
+
+.has-cancelled {
+    -fx-background: lightyellow;
+}
+.has-cancelled:selected {
+    -fx-text-fill: -fx-selection-bar-text;
+    -fx-background: -fx-selection-bar;
+}
+
+.missing {
+    -fx-background: #FCC6BB;
+}
+.missing:selected {
+    -fx-text-fill: -fx-selection-bar-text;
+    -fx-background: -fx-selection-bar;
+}

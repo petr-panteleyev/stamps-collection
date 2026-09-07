@@ -1,8 +1,8 @@
 #!/bin/sh
 
-TAGS=("Космос" "Живопись" "Спорт" "Разное" "Авиация" "Флот" "Авто")
+TAGS=("Космос" "Искусство" "Живопись" "Скульптура" "Спорт" "Разное" "Авиация" "Флот" "Флора и фауна" "Автомобили" "Маяки" "Ледоколы")
 
-BASE_URL="http://localhost:1705/stamps/api/v1/tags"
+BASE_URL="http://localhost:1710/stamps/api/v1/tags"
 
 for tag in "${TAGS[@]}"; do
   curl -X 'POST' \

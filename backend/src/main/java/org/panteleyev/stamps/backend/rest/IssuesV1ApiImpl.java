@@ -26,12 +26,11 @@ public class IssuesV1ApiImpl implements IssuesV1ApiDelegate {
     }
 
     @Override
-    public ResponseEntity<Void> postIssue(IssueDTO issueDTO) {
+    public ResponseEntity<IssueDTO> postIssue(IssueDTO issueDTO) {
         if (issueDTO.getId() != null) {
             return ResponseEntity.badRequest().build();
         }
-        service.postIssue(issueDTO);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(service.postIssue(issueDTO));
     }
 
     @Override
@@ -40,5 +39,11 @@ public class IssuesV1ApiImpl implements IssuesV1ApiDelegate {
             return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok(service.putIssue(issueDTO));
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteIssue(UUID id) {
+        service.deleteIssue(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Objects;
 import java.util.UUID;
 
+import static org.panteleyev.stamps.backend.domain.IssueItemSpecifications.hasIssue;
+
 @Service
 public class BlockService {
     private final IssueItemRepository repository;
@@ -28,7 +30,7 @@ public class BlockService {
     public BlockDTO getBlock(UUID id) {
         var entity = repository.findById(id).orElseThrow(() -> new BlockNotFoundException(id));
         if (!entity.isBlock()) throw new BlockNotFoundException(id);
-        var blockStamps = repository.findByIssueId(entity.getIssue().getId())
+        var blockStamps = repository.findAll(hasIssue(entity.getIssue())).stream()
                 .filter(IssueItemEntity::isStamp)
                 .filter(s -> Objects.equals(s.getBlockNumber(), entity.getNumberZag()))
                 .toList();

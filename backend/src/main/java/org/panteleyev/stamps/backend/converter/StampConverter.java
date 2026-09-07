@@ -52,6 +52,7 @@ public class StampConverter {
                 .toList();
         return new StampDTO()
                 .id(entity.getId())
+                .year(entity.getYear())
                 .numberZag(entity.getNumberZag())
                 .numberCfa(entity.getNumberCfa())
                 .denomination(entity.getDenomination())
@@ -60,6 +61,7 @@ public class StampConverter {
                 .hasCancelled(entity.getHasCancelled())
                 .replacementRequired(entity.getReplacementRequired())
                 .comment(entity.getComment())
+                .blockNumber(entity.getBlockNumber())
                 .tags(tags);
     }
 

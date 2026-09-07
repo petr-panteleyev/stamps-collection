@@ -68,33 +68,14 @@ paths:
 
 components:
   schemas:
-
     CouplingDTO:
       type: object
       description: 'Coupling'
       required:
-        - stamps
-        - hasClean
-        - hasCancelled
-        - replacementRequired
         - stampNumbers
+      allOf:
+        - $ref: './objects.yml#/components/schemas/IssueItemDTO'
       properties:
-        id:
-          type: string
-          format: uuid
-          description: 'Primary key'
-        hasClean:
-          type: boolean
-          description: 'Clean coupling is present in the collection'
-        hasCancelled:
-          type: boolean
-          description: 'Cancelled coupling is present in the collection'
-        replacementRequired:
-          type: boolean
-          description: 'Replacement required: damaged, etc.'
-        comment:
-          type: string
-          description: 'Comment'
         stampNumbers:
           type: array
           description: 'Stamp numbers in this coupling'

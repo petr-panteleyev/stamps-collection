@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run Backend Prod" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="org.panteleyev.stamps.backend.StampsApplication" />
+    <module name="stamps-backend" />
+    <option name="PROGRAM_PARAMETERS" value="--spring.profiles.active=prod" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

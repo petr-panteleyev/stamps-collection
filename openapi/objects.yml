@@ -9,6 +9,34 @@ paths: []
 
 components:
   schemas:
+    IssueItemDTO:
+      type: object
+      description: 'Base fields for stamps, couplings and blocks'
+      reqiured:
+        - hasClean
+        - hasCancelled
+        - replacementRequired
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 'Primary key'
+        hasClean:
+          type: boolean
+          description: 'Clean item is present in the collection'
+          nullable: false
+        hasCancelled:
+          type: boolean
+          description: 'Cancelled item is present in the collection'
+          nullable: false
+        replacementRequired:
+          type: boolean
+          description: 'Replacement required: damaged, etc.'
+          nullable: false
+        comment:
+          type: string
+          description: 'Comment'
+
     ItemPatchDTO:
       type: object
       description: 'Patch for stamp, block or coupling'

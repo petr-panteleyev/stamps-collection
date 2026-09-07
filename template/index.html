@@ -38,11 +38,11 @@ R - марка в наличии, требует замены
 </table>
 
 <script type="application/javascript">
-    const baseUrl = 'http://localhost:1705/stamps/api/v1/'
-    const baseImageUrl = 'http://localhost:1705/stamps/api/v1/images/'
-    const baseStampUrl = 'http://localhost:1705/stamps/api/v1/stamps/'
-    const baseBlockUrl = 'http://localhost:1705/stamps/api/v1/blocks/'
-    const baseCouplingUrl = 'http://localhost:1705/stamps/api/v1/couplings/'
+    const baseUrl = 'http://localhost:1710/stamps/api/v1/'
+    const baseImageUrl = 'http://localhost:1710/stamps/api/v1/images/'
+    const baseStampUrl = 'http://localhost:1710/stamps/api/v1/stamps/'
+    const baseBlockUrl = 'http://localhost:1710/stamps/api/v1/blocks/'
+    const baseCouplingUrl = 'http://localhost:1710/stamps/api/v1/couplings/'
 
     function getStatus(issue) {
         let hasClean = false
@@ -238,7 +238,7 @@ R - марка в наличии, требует замены
         skip.colSpan = 4
 
         const cell = row.insertCell(-1)
-        cell.colSpan = 2
+        cell.colSpan = 5
 
         for (const stamp of stamps) {
             const img = document.createElement("img")
@@ -269,7 +269,7 @@ R - марка в наличии, требует замены
         return row
     }
 
-    fetch("http://localhost:1705/stamps/api/v1/issues?region=%D0%A1%D0%A1%D0%A1%D0%A0&yearStart=1919&yearEnd=1991")
+    fetch("http://localhost:1710/stamps/api/v1/issues?region=%D0%A1%D0%A1%D0%A1%D0%A0&yearStart=1919&yearEnd=1991")
         .then(r => r.json())
         .then(data => {
             const table = document.getElementById("mainTable")

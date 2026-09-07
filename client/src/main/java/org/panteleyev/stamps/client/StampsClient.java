@@ -12,18 +12,28 @@ import org.panteleyev.stamps.client.openapi.api.StampsV1Api;
 import org.panteleyev.stamps.client.openapi.api.TagsV1Api;
 import org.panteleyev.stamps.client.openapi.invoker.ApiException;
 import org.panteleyev.stamps.client.openapi.invoker.Configuration;
+import org.panteleyev.stamps.dto.BlockDTO;
+import org.panteleyev.stamps.dto.CouplingDTO;
 import org.panteleyev.stamps.dto.IssueDTO;
+import org.panteleyev.stamps.dto.ItemPatchDTO;
 import org.panteleyev.stamps.dto.RegionDTO;
+import org.panteleyev.stamps.dto.StampDTO;
 import org.panteleyev.stamps.dto.TagDTO;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 public class StampsClient {
     @FunctionalInterface
     private interface ApiCaller<R> {
         R call() throws ApiException;
+    }
+
+    @FunctionalInterface
+    private interface VoidApiCaller {
+        void call() throws ApiException;
     }
 
     private static final String CONTEXT_ROOT = "/stamps";
@@ -104,6 +114,40 @@ public class StampsClient {
         return call(() -> issuesV1Api.getIssues(region, yearStart, yearEnd, null));
     }
 
+    public Either<ClientError, List<IssueDTO>> getIssues() {
+        return call(() -> issuesV1Api.getIssues(null, null, null, null));
+    }
+
+    public Either<ClientError, IssueDTO> postIssue(IssueDTO dto) {
+        return call(() -> issuesV1Api.postIssue(dto));
+    }
+
+    public Either<ClientError, IssueDTO> putIssue(IssueDTO dto) {
+        return call(() -> issuesV1Api.putIssue(dto.getId(), dto));
+    }
+
+    public Either<ClientError, Void> deleteIssue(UUID id) {
+        return callVoid(() -> issuesV1Api.deleteIssue(id));
+    }
+
+    /* Stamps */
+
+    public Either<ClientError, StampDTO> patchStamp(UUID id, ItemPatchDTO patch) {
+        return call(() -> stampsV1Api.patchStamp(id, patch));
+    }
+
+    /* Couplings */
+
+    public Either<ClientError, CouplingDTO> patchCoupling(UUID id, ItemPatchDTO patch) {
+        return call(() -> couplingsV1Api.patchCoupling(id, patch));
+    }
+
+    /* Blocks */
+
+    public Either<ClientError, BlockDTO> patchBlock(UUID id, ItemPatchDTO patch) {
+        return call(() -> blocksV1Api.patchBlock(id, patch));
+    }
+
     //
 
     private static <R> Either<ClientError, R> call(ApiCaller<R> caller) {
@@ -114,14 +158,12 @@ public class StampsClient {
         }
     }
 
-    static void main() {
-        var serverUrl = "http://localhost:1705";
-        var timeOut = Duration.ofSeconds(10);
-
-        var client = new StampsClient(serverUrl, timeOut);
-
-        System.out.println(client.getRegions().right().orElseThrow());
-        System.out.println(client.getTags().right().orElseThrow());
-        System.out.println(client.getIssues("СССР", 1918, 1991).right().orElseThrow());
+    private static Either<ClientError, Void> callVoid(VoidApiCaller caller) {
+        try {
+            caller.call();
+            return Either.right(null);
+        } catch (ApiException ex) {
+            return Either.left(new ClientError(ex.getCode(), ex.getMessage()));
+        }
     }
 }
