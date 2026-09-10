@@ -17,7 +17,7 @@
     <name>Backend</name>
 
     <properties>
-        <revision>26.9.1</revision>
+        <revision>26.9.2</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>26</java.version>
         <maven.compiler.release>26</maven.compiler.release>

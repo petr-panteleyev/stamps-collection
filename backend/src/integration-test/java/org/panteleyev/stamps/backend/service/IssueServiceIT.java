@@ -53,7 +53,7 @@ public class IssueServiceIT extends BaseSpringBootTest {
     @Sql("/sql/initTags.sql")
     @Sql("/sql/IssueServiceIT/testGetIssues.sql")
     public void testGetIssues(String region, Integer startYear, Integer endYear, List<UUID> expected) {
-        var actual = service.getIssues(region, startYear, endYear, null);
+        var actual = service.getIssues(region, startYear, endYear, null, null);
         assertThat(actual).hasSize(expected.size());
         assertThat(actual.stream().map(IssueDTO::getId)).containsExactlyInAnyOrderElementsOf(expected);
     }
@@ -125,7 +125,7 @@ public class IssueServiceIT extends BaseSpringBootTest {
 
         service.putIssue(issueDto);
 
-        var actualList = service.getIssues(issueRegion, issueDate.getYear(), issueDate.getYear(), null);
+        var actualList = service.getIssues(issueRegion, issueDate.getYear(), issueDate.getYear(), null, null);
         assertThat(actualList).hasSize(1);
 
         var actual = actualList.getFirst();

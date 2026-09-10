@@ -45,7 +45,7 @@ public class IssueService {
     }
 
     @Transactional(readOnly = true)
-    public List<IssueDTO> getIssues(String region, Integer yearStart, Integer yearEnd, String tags) {
+    public List<IssueDTO> getIssues(String region, Integer yearStart, Integer yearEnd, String tags, String excludedTags) {
         var setOfTags = tags == null ?
                 null :
                 Arrays.stream(tags.split(","))

@@ -32,6 +32,20 @@ public class DtoUtilsTest extends BaseUnitTest {
         assertThat(DtoUtils.negate(value)).isEqualTo(expected);
     }
 
+    @ParameterizedTest
+    @CsvSource(
+            value = {
+                    "NULL, false",
+                    "false, false",
+                    "true, true",
+            },
+            nullValues = "NULL"
+    )
+    @DisplayName("should normalize nullable boolean value")
+    public void testNormalizeBoolean(Boolean value, boolean expected) {
+        assertThat(DtoUtils.normalize(value)).isEqualTo(expected);
+    }
+
     @Test
     @DisplayName("should make a copy of StampDTO")
     public void testStampCopy() {

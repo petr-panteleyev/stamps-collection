@@ -21,8 +21,8 @@ public class IssuesV1ApiImpl implements IssuesV1ApiDelegate {
     }
 
     @Override
-    public ResponseEntity<List<IssueDTO>> getIssues(String region, Integer yearStart, Integer yearEnd, String tags) {
-        return ResponseEntity.ok(service.getIssues(region, yearStart, yearEnd, tags));
+    public ResponseEntity<List<IssueDTO>> getIssues(String region, Integer yearStart, Integer yearEnd, String tags, String excludedTags) {
+        return ResponseEntity.ok(service.getIssues(region, yearStart, yearEnd, tags, excludedTags));
     }
 
     @Override

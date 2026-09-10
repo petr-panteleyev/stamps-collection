@@ -25,6 +25,33 @@ paths:
               schema:
                 $ref: '#/components/schemas/ImageUploadResponseDto'
 
+  /api/v1/images/{id}:
+    put:
+      tags:
+        - "images, v1"
+      summary: 'Put image'
+      operationId: putImage
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImageUploadDTO'
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageUploadResponseDto'
+
   /api/v1/images/{id}/binary:
     get:
       tags:
@@ -58,8 +85,6 @@ components:
       type: object
       description: 'Image for stamps, blocks and couplings'
       required:
-        - region
-        - numberZag
         - image
       properties:
         region:
@@ -74,6 +99,7 @@ components:
         image:
           type: string
           description: 'Image bytes encoded in Base64'
+          nullable: false
 
     ImageUploadResponseDto:
       type: object

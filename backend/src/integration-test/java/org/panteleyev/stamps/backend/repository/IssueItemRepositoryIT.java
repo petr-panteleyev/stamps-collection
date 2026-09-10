@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.argumentSet;
+import static org.panteleyev.stamps.backend.domain.IssueItemSpecifications.doesNotHaveTags;
 import static org.panteleyev.stamps.backend.domain.IssueItemSpecifications.hasNumberZag;
 import static org.panteleyev.stamps.backend.domain.IssueItemSpecifications.hasRegion;
 import static org.panteleyev.stamps.backend.domain.IssueItemSpecifications.hasTags;
@@ -34,38 +35,42 @@ public class IssueItemRepositoryIT extends BaseSpringBootTest {
     private static List<Arguments> testSpecificationsArguments() {
         return List.of(
                 argumentSet("No conditions",
-                        null, null, null, null,
+                        null, null, null, null, null,
                         List.of(
                                 161, 5280, 5281, 5282, 5283, 5284,
                                 1232, 1233, 1234, 1235, 1236
                         )
                 ),
                 argumentSet("Region",
-                        "СССР", null, null, null,
+                        "СССР", null, null, null, null,
                         List.of(161, 5280, 5281, 5282, 5283, 5284)
                 ),
                 argumentSet("Region and start year",
-                        "СССР", 1983, null, null,
+                        "СССР", 1983, null, null, null,
                         List.of(5281, 5282, 5283, 5284)
                 ),
                 argumentSet("Region and end year",
-                        "СССР", null, 1983, null,
+                        "СССР", null, 1983, null, null,
                         List.of(161, 5280, 5281)
                 ),
                 argumentSet("Region and both years",
-                        "СССР", 1983, 1985, null,
+                        "СССР", 1983, 1985, null, null,
                         List.of(5281, 5282, 5283)
                 ),
                 argumentSet("Region and tags",
-                        "СССР", null, null, Set.of("Космос", "Спорт"),
+                        "СССР", null, null, Set.of("Космос", "Спорт"), null,
                         List.of(5280, 5282, 5283, 5284)
                 ),
                 argumentSet("Tags only",
-                        null, null, null, Set.of("Космос"),
+                        null, null, null, Set.of("Космос"), null,
                         List.of(5280, 5282, 5284, 1232, 1235, 1236)
                 ),
+                argumentSet("Excluded tags only",
+                        null, null, null, null, Set.of("Космос"),
+                        List.of(5281, 5283, 1233, 1234, 161)
+                ),
                 argumentSet("No tags",
-                        null, null, null, Set.of(),
+                        null, null, null, Set.of(), null,
                         List.of(161)
                 )
         );
@@ -77,11 +82,13 @@ public class IssueItemRepositoryIT extends BaseSpringBootTest {
     @Sql("/sql/initTags.sql")
     @Sql("/sql/IssueItemRepositoryIT/testSpecifications.sql")
     @Transactional
-    public void testSpecifications(String region, Integer startYear, Integer endYear, Collection<String> tags,
+    public void testSpecifications(String region, Integer startYear, Integer endYear,
+            Collection<String> tags, Collection<String> excludedTags,
             List<Integer> expected)
     {
         var actual = repository.findAll(
-                Stream.of(hasRegion(region), hasYearBetween(startYear, endYear), hasTags(tags))
+                Stream.of(hasRegion(region), hasYearBetween(startYear, endYear),
+                                hasTags(tags), doesNotHaveTags(excludedTags))
                         .reduce(Specification::and)
                         .orElse(null)
         );

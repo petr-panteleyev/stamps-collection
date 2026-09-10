@@ -6,6 +6,7 @@ module stamps.desktop {
     requires org.panteleyev.commons;
     requires org.panteleyev.fx;
     requires javafx.graphics;
+    requires javafx.swing;
     requires org.panteleyev.stamps.dto;
     requires stamps.client;
     requires org.controlsfx.controls;

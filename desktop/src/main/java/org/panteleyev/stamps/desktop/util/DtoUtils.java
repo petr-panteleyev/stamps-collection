@@ -10,6 +10,7 @@ import org.panteleyev.stamps.dto.StampDTO;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.stream.Collectors;
 
 public final class DtoUtils {
     public static final Comparator<RegionDTO> REGION_COMPATAOR_BY_NAME = Comparator.comparing(RegionDTO::getName);
@@ -21,6 +22,14 @@ public final class DtoUtils {
 
     public static boolean negate(Boolean value) {
         return value == null || !value;
+    }
+
+    public static int normalize(Integer value) {
+        return value == null ? 0 : value;
+    }
+
+    public static boolean normalize(Boolean value) {
+        return value != null && value;
     }
 
     /// Makes a copy of [StampDTO].
@@ -93,6 +102,12 @@ public final class DtoUtils {
                 .stamps(new ArrayList<>(issue.getStamps().stream().map(DtoUtils::copy).toList()))
                 .blocks(new ArrayList<>(issue.getBlocks().stream().map(DtoUtils::copy).toList()))
                 .couplings(new ArrayList<>(issue.getCouplings().stream().map(DtoUtils::copy).toList()));
+    }
+
+    public static String getCouplingDescription(CouplingDTO coupling) {
+        return "Сцепка марок " + coupling.getStampNumbers().stream()
+                .map(n -> Integer.toString(n))
+                .collect(Collectors.joining(","));
     }
 
     private DtoUtils() {

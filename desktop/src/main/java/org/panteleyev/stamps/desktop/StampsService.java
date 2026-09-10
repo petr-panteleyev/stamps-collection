@@ -5,21 +5,25 @@ package org.panteleyev.stamps.desktop;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.image.Image;
 import org.panteleyev.stamps.client.StampsClient;
 import org.panteleyev.stamps.dto.BlockDTO;
 import org.panteleyev.stamps.dto.CouplingDTO;
+import org.panteleyev.stamps.dto.ImageUploadDTO;
 import org.panteleyev.stamps.dto.IssueDTO;
 import org.panteleyev.stamps.dto.ItemPatchDTO;
 import org.panteleyev.stamps.dto.RegionDTO;
 import org.panteleyev.stamps.dto.StampDTO;
 import org.panteleyev.stamps.dto.TagDTO;
 
+import java.io.ByteArrayInputStream;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -36,6 +40,8 @@ public class StampsService {
     private final Map<UUID, IssueDTO> issues = new HashMap<>();
 
     private final BooleanProperty connectedProperty = new SimpleBooleanProperty(false);
+
+    private final Map<UUID, Image> imageCache = new ConcurrentHashMap<>();
 
     public void init(String serverUrl) {
         lock.lock();
@@ -80,13 +86,11 @@ public class StampsService {
         return regions;
     }
 
-    public List<IssueDTO> getIssues(String region, Integer yearStart, Integer yearEnd) {
+    public List<IssueDTO> getIssues(String region) {
         lock.lock();
         try {
             return issues.values().stream()
                     .filter(i -> Objects.equals(i.getRegion(), region))
-                    .filter(i -> i.getDate().getYear() >= yearStart)
-                    .filter(i -> i.getDate().getYear() <= yearEnd)
                     .sorted(ISSUE_COMPARATOR_BY_DATE)
                     .toList();
         } finally {
@@ -97,7 +101,7 @@ public class StampsService {
     public IssueDTO createIssue(IssueDTO issue) {
         lock.lock();
         try {
-            var created =  client.postIssue(issue).right().orElseThrow();
+            var created = client.postIssue(issue).right().orElseThrow();
             issues.put(created.getId(), created);
             return created;
         } finally {
@@ -108,7 +112,7 @@ public class StampsService {
     public IssueDTO updateIssue(IssueDTO issue) {
         lock.lock();
         try {
-            var updated =  client.putIssue(issue).right().orElseThrow();
+            var updated = client.putIssue(issue).right().orElseThrow();
             issues.put(updated.getId(), updated);
             return updated;
         } finally {
@@ -127,15 +131,38 @@ public class StampsService {
         }
     }
 
-    public void patchItem(Object item, ItemPatchDTO patch) {
+    public Object patchItem(Object item, ItemPatchDTO patch) {
         lock.lock();
         try {
-            switch (item) {
+            var result = switch (item) {
                 case StampDTO stamp -> client.patchStamp(stamp.getId(), patch);
                 case CouplingDTO coupling -> client.patchCoupling(coupling.getId(), patch);
                 case BlockDTO block -> client.patchBlock(block.getId(), patch);
                 default -> throw new IllegalArgumentException("Invalid class " + item.getClass().getSimpleName());
-            }
+            };
+            return result.right().orElseThrow();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public Image getImage(UUID uuid) {
+        lock.lock();
+        try {
+            return imageCache.computeIfAbsent(uuid, key -> {
+                var bytes = client.getImage(key).right().orElse(null);
+                return bytes == null ? null : new Image(new ByteArrayInputStream(bytes));
+            });
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void uploadImage(UUID id, ImageUploadDTO dto) {
+        lock.lock();
+        try {
+            var result = client.uploadImage(id, dto).right().orElseThrow();
+            imageCache.remove(result.getId());
         } finally {
             lock.unlock();
         }

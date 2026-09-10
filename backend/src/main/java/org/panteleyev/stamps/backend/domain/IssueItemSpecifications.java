@@ -29,6 +29,21 @@ public final class IssueItemSpecifications {
         };
     }
 
+    public static Specification<IssueItemEntity> doesNotHaveTags(Collection<String> tags) {
+        return (root, query, cb) -> {
+            if (tags == null || tags.isEmpty()) return cb.conjunction();
+
+            var subquery = query.subquery(Long.class);
+            var subRoot = subquery.from(IssueItemEntity.class);
+            subquery.select(cb.literal(1L));
+            subquery.where(
+                    cb.equal(subRoot.get("id"), root.get("id")),
+                    subRoot.join("tags").get("name").in(tags)
+            );
+            return cb.not(cb.exists(subquery));
+        };
+    }
+
     public static Specification<IssueItemEntity> hasNumberZag(Integer numberZag) {
         return (root, _, cb) -> {
             if (numberZag == null) return cb.conjunction();

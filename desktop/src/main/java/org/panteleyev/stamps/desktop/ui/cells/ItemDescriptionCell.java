@@ -11,6 +11,7 @@ import org.panteleyev.stamps.dto.StampDTO;
 import java.util.stream.Collectors;
 
 import static org.panteleyev.stamps.desktop.ui.Styles.CSS_ISSUE_TITLE;
+import static org.panteleyev.stamps.desktop.util.DtoUtils.getCouplingDescription;
 import static org.panteleyev.stamps.desktop.util.StringUtil.DATE_FORMATTER;
 
 public class ItemDescriptionCell extends TreeTableCell<Object, Object> {
@@ -34,11 +35,5 @@ public class ItemDescriptionCell extends TreeTableCell<Object, Object> {
         };
 
         setText(text);
-    }
-
-    private static String getCouplingDescription(CouplingDTO coupling) {
-        return "Сцепка марок " + coupling.getStampNumbers().stream()
-                .map(n -> Integer.toString(n))
-                .collect(Collectors.joining(","));
     }
 }

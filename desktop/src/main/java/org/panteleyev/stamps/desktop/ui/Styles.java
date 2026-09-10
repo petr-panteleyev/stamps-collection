@@ -20,6 +20,10 @@ public final class Styles {
     public static final String CSS_HAS_CANCELLED = "has-cancelled";
     public static final String CSS_MISSING = "missing";
 
+    public static final int TABLE_IMAGE_SIZE = 100;
+    public static final int TOOLTIP_STAMP_IMAGE_SIZE = 300;
+    public static final int TOOLTIP_BLOCK_IMAGE_SIZE = 600;
+
 
     private Styles(){}
 }

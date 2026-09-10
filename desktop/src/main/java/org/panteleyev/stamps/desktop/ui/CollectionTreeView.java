@@ -8,11 +8,11 @@ import org.panteleyev.stamps.desktop.ui.cells.ItemDenominationCell;
 import org.panteleyev.stamps.desktop.ui.cells.ItemDescriptionCell;
 import org.panteleyev.stamps.desktop.ui.cells.ItemHasCancelledCell;
 import org.panteleyev.stamps.desktop.ui.cells.ItemHasCleanCell;
+import org.panteleyev.stamps.desktop.ui.cells.ItemImageCell;
 import org.panteleyev.stamps.desktop.ui.cells.ItemNumberCfaCell;
 import org.panteleyev.stamps.desktop.ui.cells.ItemNumberZagCell;
 import org.panteleyev.stamps.desktop.ui.cells.ItemReplacementRequiredCell;
 import org.panteleyev.stamps.desktop.ui.cells.ItemTableRow;
-import org.panteleyev.stamps.desktop.ui.cells.ItemTagsCell;
 import org.panteleyev.stamps.desktop.ui.cells.ItemYearCell;
 import org.panteleyev.stamps.dto.IssueDTO;
 
@@ -21,6 +21,7 @@ import java.util.List;
 
 import static org.panteleyev.fx.factories.TreeTableFactory.treeItem;
 import static org.panteleyev.fx.factories.TreeTableFactory.treeTableObjectColumn;
+import static org.panteleyev.stamps.desktop.ui.Styles.TABLE_IMAGE_SIZE;
 
 public class CollectionTreeView extends TreeTableView<Object> {
 
@@ -41,17 +42,17 @@ public class CollectionTreeView extends TreeTableView<Object> {
         numberCfaColumn.setCellFactory(_ -> new ItemNumberCfaCell());
         numberCfaColumn.widthBinding(w.multiply(0.05));
 
+        var imageColumn = treeTableObjectColumn("");
+        imageColumn.setCellFactory(_ -> new ItemImageCell());
+        imageColumn.setMinWidth(TABLE_IMAGE_SIZE + 10);
+
         var denominationColumn = treeTableObjectColumn("");
         denominationColumn.setCellFactory(_ -> new ItemDenominationCell());
         denominationColumn.widthBinding(w.multiply(0.05));
 
         var titleColumn = treeTableObjectColumn("Описание");
         titleColumn.setCellFactory(_ -> new ItemDescriptionCell());
-        titleColumn.widthBinding(w.multiply(0.50));
-
-//        var tagsColumn = treeTableObjectColumn("Теги");
-//        tagsColumn.setCellFactory(_ -> new ItemTagsCell());
-//        tagsColumn.widthBinding(w.multiply(0.15));
+        titleColumn.widthBinding(w.multiply(0.40));
 
         var replacementRequiredColumn = treeTableObjectColumn("З");
         replacementRequiredColumn.setCellFactory(_ -> new ItemReplacementRequiredCell());
@@ -73,6 +74,7 @@ public class CollectionTreeView extends TreeTableView<Object> {
                 yearColumn,
                 numberZagColumn,
                 numberCfaColumn,
+                imageColumn,
                 denominationColumn,
                 titleColumn,
 //                tagsColumn,
@@ -101,12 +103,7 @@ public class CollectionTreeView extends TreeTableView<Object> {
             }
 
             for (var block : issue.getBlocks()) {
-                var blockItem = treeItem((Object)block);
-                blockItem.setExpanded(true);
-                for (var stamp : block.getStamps()) {
-                    blockItem.getChildren().add(treeItem(stamp));
-                }
-                issueItem.getChildren().add(blockItem);
+                issueItem.getChildren().add(treeItem(block));
             }
 
             root.getChildren().add(issueItem);

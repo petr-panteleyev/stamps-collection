@@ -57,6 +57,15 @@ public class ImageService {
         return entity.getId();
     }
 
+    @Transactional
+    public UUID putImage(UUID id, ImageUploadDTO dto) {
+        var entity = new ImageEntity();
+        entity.setId(id);
+        entity.setBytes(Base64.getDecoder().decode(dto.getImage()));
+        repository.save(entity);
+        return entity.getId();
+    }
+
     public Optional<byte[]> getImageBytes(UUID uuid) {
         return repository.findById(uuid).map(ImageEntity::getBytes);
     }

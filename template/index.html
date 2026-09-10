@@ -28,6 +28,7 @@ R - марка в наличии, требует замены
         <th>Год.</th>
         <th>Кат.</th>
         <th>ЦФА</th>
+        <th></th>
         <th>Ном.</th>
         <th>Описание</th>
         <th>Ч</th>
@@ -39,10 +40,14 @@ R - марка в наличии, требует замены
 
 <script type="application/javascript">
     const baseUrl = 'http://localhost:1710/stamps/api/v1/'
-    const baseImageUrl = 'http://localhost:1710/stamps/api/v1/images/'
+    const baseIssueUrl = baseUrl + 'issues'
+    const baseImageUrl = baseUrl + 'images/'
     const baseStampUrl = 'http://localhost:1710/stamps/api/v1/stamps/'
     const baseBlockUrl = 'http://localhost:1710/stamps/api/v1/blocks/'
     const baseCouplingUrl = 'http://localhost:1710/stamps/api/v1/couplings/'
+
+    let hasMissing = false
+    let hasReplacement = false
 
     function getStatus(issue) {
         let hasClean = false
@@ -66,8 +71,9 @@ R - марка в наличии, требует замены
         return "M"
     }
 
-    function createTitleRow(title) {
+    function createTitleRow(title, status) {
         const row = document.createElement("tr")
+        row.dataset.status = status
 
         const skip = row.insertCell(-1)
         skip.colSpan = 4
@@ -111,18 +117,33 @@ R - марка в наличии, требует замены
         return checkbox
     }
 
+    function getClassName(item) {
+        if (item.hasClean) {
+            return 'present'
+        } else {
+            if (item.replacementRequired || item.hasCancelled) {
+                return 'replace'
+            } else {
+                return 'missing'
+            }
+        }
+    }
+
     function createStampRow(stamp, year) {
         const row = document.createElement("tr")
 
         if (stamp.hasClean) {
-            row.classList.add('present')
+            row.dataset.status = 'P'
         } else {
             if (stamp.replacementRequired || stamp.hasCancelled) {
-                row.classList.add('replace')
+                hasReplacement = true
+                row.dataset.status = 'R'
             } else {
-                row.classList.add('missing')
+                row.dataset.status = 'M'
+                hasMissing = true
             }
         }
+        row.classList.add(getClassName(stamp))
 
         const yearCell = row.insertCell(-1)
         yearCell.innerHTML = year
@@ -131,7 +152,18 @@ R - марка в наличии, требует замены
         zagCell.innerHTML = stamp.numberZag
 
         const cfaCell = row.insertCell(-1)
-        cfaCell.innerHTML = stamp.numberCfa
+        if (stamp.numberCfa == 0) {
+            cfaCell.innerHTML = ''
+        } else {
+            cfaCell.innerHTML = stamp.numberCfa
+        }
+
+        const imageCell = row.insertCell(-1)
+        const img = document.createElement("img")
+        img.setAttribute("class", "stampImage")
+        img.setAttribute("src", baseImageUrl + stamp.id + '/binary')
+        img.setAttribute("alt", stamp.numberZag)
+        imageCell.appendChild(img)
 
         const denomincationCell = row.insertCell(-1)
         denomincationCell.innerHTML = stamp.denomination.toFixed(2).replace(".", ",")
@@ -157,18 +189,22 @@ R - марка в наличии, требует замены
     function createCouplingRow(coupling) {
         const row = document.createElement("tr")
 
+        let className = null
         if (coupling.hasClean) {
-            row.classList.add('present')
+            row.dataset.status = 'P'
         } else {
             if (coupling.replacementRequired || coupling.hasCancelled) {
-                row.classList.add('replace')
+                row.dataset.status = 'R'
+                hasReplacement = true
             } else {
-                row.classList.add('missing')
+                row.dataset.status = 'M'
+                hasMissing = true
             }
         }
+        row.classList.add(getClassName(coupling))
 
         const skip = row.insertCell(-1)
-        skip.colSpan = 4
+        skip.colSpan = 5
 
         const title = row.insertCell(-1)
         title.innerHTML = `Сцепка марок ${coupling.stampNumbers[0]}-${coupling.stampNumbers.at(-1)}`
@@ -192,14 +228,17 @@ R - марка в наличии, требует замены
         const row = document.createElement("tr")
 
         if (block.hasClean) {
-            row.classList.add('present')
+            row.dataset.status = 'P'
         } else {
             if (block.replacementRequired || block.hasCancelled) {
-                row.classList.add('replace')
+                row.dataset.status = 'R'
+                hasReplacement = true
             } else {
-                row.classList.add('missing')
+                row.dataset.status = 'M'
+                hasMissing = true
             }
         }
+        row.classList.add(getClassName(block))
 
         const yearCell = row.insertCell(-1)
         yearCell.innerHTML = year
@@ -208,7 +247,18 @@ R - марка в наличии, требует замены
         zagCell.innerHTML = 'Бл ' + block.numberZag
 
         const cfaCell = row.insertCell(-1)
-        cfaCell.innerHTML = block.numberCfa
+        if (block.numberCfa == 0) {
+            cfaCell.innerHTML = ''
+        } else {
+            cfaCell.innerHTML = stamp.numberCfa
+        }
+
+        const imageCell = row.insertCell(-1)
+        const img = document.createElement("img")
+        img.setAttribute("class", "blockImage")
+        img.setAttribute("src", baseImageUrl + block.id + '/binary')
+        img.setAttribute("alt", `BL${block.numberZag}`)
+        imageCell.appendChild(img)
 
         const denomincationCell = row.insertCell(-1)
         denomincationCell.innerHTML = '-'
@@ -231,52 +281,78 @@ R - марка в наличии, требует замены
         return row
     }
 
-    function createStampImagesRow(stamps) {
-        const row = document.createElement("tr")
+    function filter(showAll, showOnlyMissing, showOnlyReplace) {
+        const elements = document.body.getElementsByTagName("tr")
+        for (const el of elements) {
+            const status = el.dataset.status
 
-        const skip = row.insertCell(-1)
-        skip.colSpan = 4
+            if (status == undefined || showAll) {
+                el.style.display = null
+                continue
+            }
 
-        const cell = row.insertCell(-1)
-        cell.colSpan = 5
+            if (showOnlyMissing && status != 'M') {
+                el.style.display = "none"
+            } else if (showOnlyReplace && status != 'R') {
+                el.style.display = "none"
+            } else {
+                el.style.display = null
+            }
+        }
+    }
 
-        for (const stamp of stamps) {
-            const img = document.createElement("img")
-            img.setAttribute("class", "stampImage")
-            img.setAttribute("src", baseImageUrl + stamp.id + '/binary')
-            img.setAttribute("alt", stamp.numberZag)
-            cell.appendChild(img)
+    function showFilterButtons() {
+        const p = document.getElementById('filterButtons')
+
+        const showAllFilterLabel = document.createElement('label')
+        const showAllFilterRadio = document.createElement('input')
+        showAllFilterRadio.type = 'radio'
+        showAllFilterRadio.name = 'filter'
+        showAllFilterRadio.checked = true
+        showAllFilterRadio.onchange = function () {
+            filter(true, false, false)
+        }
+        showAllFilterLabel.appendChild(showAllFilterRadio)
+        showAllFilterLabel.appendChild(document.createTextNode('Все'))
+        p.appendChild(showAllFilterLabel)
+
+        if (hasMissing) {
+            const showOnlyMissingLabel = document.createElement('label')
+            const showOnlyMissingRadio = document.createElement('input')
+            showOnlyMissingRadio.type = 'radio'
+            showOnlyMissingRadio.name = 'filter'
+            showOnlyMissingRadio.checked = false
+            showOnlyMissingRadio.onchange = function () {
+                filter(false, true, false)
+            }
+            showOnlyMissingLabel.appendChild(showOnlyMissingRadio)
+            showOnlyMissingLabel.appendChild(document.createTextNode('Манколист'))
+            p.appendChild(showOnlyMissingLabel)
         }
 
-        return row
+        if (hasReplacement) {
+            const showOnlyReplaceLabel = document.createElement('label')
+            const showOnlyReplaceRadio = document.createElement('input')
+            showOnlyReplaceRadio.type = 'radio'
+            showOnlyReplaceRadio.name = 'filter'
+            showOnlyReplaceRadio.checked = false
+            showOnlyReplaceRadio.onchange = function () {
+                filter(false, false, true)
+            }
+            showOnlyReplaceLabel.appendChild(showOnlyReplaceRadio)
+            showOnlyReplaceLabel.appendChild(document.createTextNode('На замену'))
+            p.appendChild(showOnlyReplaceLabel)
+        }
     }
 
-    function createBlockImagesRow(block) {
-        const row = document.createElement("tr")
-
-        const skip = row.insertCell(-1)
-        skip.colSpan = 4
-
-        const cell = row.insertCell(-1)
-        cell.colSpan = 2
-
-        const img = document.createElement("img")
-        img.setAttribute("class", "blockImage")
-        img.setAttribute("src", baseImageUrl + block.id + '/binary')
-        img.setAttribute("alt", `BL${block.numberZag}`)
-        cell.appendChild(img)
-
-        return row
-    }
-
-    fetch("http://localhost:1710/stamps/api/v1/issues?region=%D0%A1%D0%A1%D0%A1%D0%A0&yearStart=1919&yearEnd=1991")
+    fetch(baseIssueUrl + "?region=%D0%A1%D0%A1%D0%A1%D0%A0&yearStart=1919&yearEnd=1991")
         .then(r => r.json())
         .then(data => {
             const table = document.getElementById("mainTable")
             for (const issue of data) {
                 const status = getStatus(issue)
 
-                const titleRow = createTitleRow(issue.title)
+                const titleRow = createTitleRow(issue.title, status)
                 table.appendChild(titleRow)
 
                 const year = new Date(issue.date).getFullYear()
@@ -285,20 +361,16 @@ R - марка в наличии, требует замены
                     table.appendChild(createStampRow(stamp, year))
                 }
 
-                const stampImagesRow = createStampImagesRow(issue.stamps)
-                table.appendChild(stampImagesRow)
-
                 for (const coupling of issue.couplings) {
                     table.appendChild(createCouplingRow(coupling))
                 }
 
                 for (const block of issue.blocks) {
                     table.appendChild(createBlockRow(block, year))
-                    table.appendChild(createBlockImagesRow(block))
                 }
             }
 
-            showButtons()
+            showFilterButtons()
         })
         .catch(err => console.error(err))
 </script>

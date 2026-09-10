@@ -14,12 +14,18 @@ import org.panteleyev.stamps.client.openapi.invoker.ApiException;
 import org.panteleyev.stamps.client.openapi.invoker.Configuration;
 import org.panteleyev.stamps.dto.BlockDTO;
 import org.panteleyev.stamps.dto.CouplingDTO;
+import org.panteleyev.stamps.dto.ImageUploadDTO;
+import org.panteleyev.stamps.dto.ImageUploadResponseDto;
 import org.panteleyev.stamps.dto.IssueDTO;
 import org.panteleyev.stamps.dto.ItemPatchDTO;
 import org.panteleyev.stamps.dto.RegionDTO;
 import org.panteleyev.stamps.dto.StampDTO;
 import org.panteleyev.stamps.dto.TagDTO;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
@@ -108,14 +114,37 @@ public class StampsClient {
         return call(tagsV1Api::getTags);
     }
 
+    /* Images */
+
+    public Either<ClientError, byte[]> getImage(UUID uuid) {
+        var result = call(() -> imagesV1Api.getImageBytes(uuid));
+        if (result.isLeft()) return Either.left(result.left().orElseThrow());
+
+        var file = result.right().orElseThrow();
+        try (var inputStream = new FileInputStream(file)) {
+            var bytes = new ByteArrayInputStream(inputStream.readAllBytes()).readAllBytes();
+            return Either.right(bytes);
+        } catch (IOException ex) {
+            throw new UncheckedIOException(ex);
+        }
+    }
+
+    public Either<ClientError, ImageUploadResponseDto> uploadImage(ImageUploadDTO dto) {
+        return call(() -> imagesV1Api.postImage(dto));
+    }
+
+    public Either<ClientError, ImageUploadResponseDto> uploadImage(UUID id, ImageUploadDTO dto) {
+        return call(() -> imagesV1Api.putImage(id, dto));
+    }
+
     /* Issues */
 
     public Either<ClientError, List<IssueDTO>> getIssues(String region, int yearStart, int yearEnd) {
-        return call(() -> issuesV1Api.getIssues(region, yearStart, yearEnd, null));
+        return call(() -> issuesV1Api.getIssues(region, yearStart, yearEnd, null, null));
     }
 
     public Either<ClientError, List<IssueDTO>> getIssues() {
-        return call(() -> issuesV1Api.getIssues(null, null, null, null));
+        return call(() -> issuesV1Api.getIssues(null, null, null, null, null));
     }
 
     public Either<ClientError, IssueDTO> postIssue(IssueDTO dto) {

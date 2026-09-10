@@ -36,6 +36,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: excluded_tags
+          description: 'Comma separated list of excluded tags'
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         "200":
           description: 'Success'
