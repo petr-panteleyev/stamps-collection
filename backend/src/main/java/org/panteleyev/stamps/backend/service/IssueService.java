@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -22,6 +23,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.panteleyev.stamps.backend.domain.IssueItemSpecifications.doesNotHaveTags;
 import static org.panteleyev.stamps.backend.domain.IssueItemSpecifications.hasRegion;
 import static org.panteleyev.stamps.backend.domain.IssueItemSpecifications.hasTags;
 import static org.panteleyev.stamps.backend.domain.IssueItemSpecifications.hasYearBetween;
@@ -45,18 +47,37 @@ public class IssueService {
     }
 
     @Transactional(readOnly = true)
-    public List<IssueDTO> getIssues(String region, Integer yearStart, Integer yearEnd, String tags, String excludedTags) {
+    public List<IssueDTO> getIssues(String region, Integer yearStart, Integer yearEnd, String tags,
+            String excludedTags)
+    {
         var setOfTags = tags == null ?
                 null :
                 Arrays.stream(tags.split(","))
                         .map(String::trim)
                         .filter(s -> !s.isBlank())
                         .collect(Collectors.toSet());
+        var setOfExcludedTags = excludedTags == null || excludedTags.isBlank() ?
+                null :
+                Arrays.stream(excludedTags.split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isBlank())
+                        .collect(Collectors.toSet());
+
+        var specs = new ArrayList<>(
+                List.of(
+                        hasRegion(region),
+                        hasYearBetween(yearStart, yearEnd),
+                        hasTags(setOfTags)
+                )
+        );
+        if (setOfTags == null || !setOfTags.isEmpty()) {
+            specs.add(doesNotHaveTags(setOfExcludedTags));
+        }
 
         var issueItems = issueItemRepository.findAll(
-                Stream.of(hasRegion(region), hasYearBetween(yearStart, yearEnd), hasTags(setOfTags))
+                specs.stream()
                         .reduce(Specification::and)
-                        .orElse(null));
+                        .orElseThrow());
 
         var grouped = issueItems.stream()
                 .collect(Collectors.groupingBy(IssueItemEntity::getIssue));

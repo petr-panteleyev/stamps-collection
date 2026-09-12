@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.stamps.desktop.util;
 
+import org.panteleyev.stamps.dto.AlbumDTO;
 import org.panteleyev.stamps.dto.BlockDTO;
 import org.panteleyev.stamps.dto.CouplingDTO;
 import org.panteleyev.stamps.dto.IssueDTO;
@@ -10,6 +11,7 @@ import org.panteleyev.stamps.dto.StampDTO;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public final class DtoUtils {
@@ -19,6 +21,8 @@ public final class DtoUtils {
 
     public static final Comparator<StampDTO> STAMP_COMPARATOR_BY_NUMBER_ZAG = Comparator.comparingInt(
             StampDTO::getNumberZag);
+
+    public static final Comparator<AlbumDTO> ALBUM_COMPARATOR_BY_NAME = Comparator.comparing(AlbumDTO::getName);
 
     public static boolean negate(Boolean value) {
         return value == null || !value;
@@ -30,6 +34,10 @@ public final class DtoUtils {
 
     public static boolean normalize(Boolean value) {
         return value != null && value;
+    }
+
+    public static <T> List<T> normalize(List<T> list) {
+        return list == null ? List.of() : list;
     }
 
     /// Makes a copy of [StampDTO].

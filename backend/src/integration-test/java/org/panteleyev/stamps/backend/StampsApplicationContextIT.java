@@ -9,5 +9,4 @@ class StampsApplicationContextIT extends BaseSpringBootTest {
 	@Test
 	void contextLoads() {
 	}
-
 }

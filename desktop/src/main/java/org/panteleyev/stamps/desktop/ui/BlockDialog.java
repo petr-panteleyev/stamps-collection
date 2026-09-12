@@ -94,7 +94,7 @@ public class BlockDialog extends BaseDialog<BlockDTO> {
         replacementCheckBox.setSelected(block.getReplacementRequired() != null && block.getReplacementRequired());
         commentEdit.setText(block.getComment());
 
-        var allTags = stampsService().getTags().stream().map(TagDTO::getName).sorted().toList();
+        var allTags = stampsService().loadTags().stream().map(TagDTO::getName).sorted().toList();
         tagsComboBox.getItems().setAll(FXCollections.observableArrayList(allTags));
         for (var i = 0; i < allTags.size(); i++) {
             if (block.getTags().contains(allTags.get(i))) {

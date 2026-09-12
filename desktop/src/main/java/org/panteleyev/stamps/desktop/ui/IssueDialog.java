@@ -47,7 +47,7 @@ public class IssueDialog extends BaseDialog<IssueDTO> {
     private final TreeTableView<Object> treeTableView = new TreeTableView<>();
 
     public IssueDialog(IssueDTO issue) {
-        setTitle("Выпуск");
+        setTitle("Выпуск - " + issue.getRegion());
 
         this.issue = issue;
 

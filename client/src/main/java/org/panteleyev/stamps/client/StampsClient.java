@@ -3,6 +3,7 @@
 package org.panteleyev.stamps.client;
 
 import org.panteleyev.functional.Either;
+import org.panteleyev.stamps.client.openapi.api.AlbumsV1Api;
 import org.panteleyev.stamps.client.openapi.api.BlocksV1Api;
 import org.panteleyev.stamps.client.openapi.api.CouplingsV1Api;
 import org.panteleyev.stamps.client.openapi.api.ImagesV1Api;
@@ -12,6 +13,7 @@ import org.panteleyev.stamps.client.openapi.api.StampsV1Api;
 import org.panteleyev.stamps.client.openapi.api.TagsV1Api;
 import org.panteleyev.stamps.client.openapi.invoker.ApiException;
 import org.panteleyev.stamps.client.openapi.invoker.Configuration;
+import org.panteleyev.stamps.dto.AlbumDTO;
 import org.panteleyev.stamps.dto.BlockDTO;
 import org.panteleyev.stamps.dto.CouplingDTO;
 import org.panteleyev.stamps.dto.ImageUploadDTO;
@@ -51,6 +53,7 @@ public class StampsClient {
     private final StampsV1Api stampsV1Api;
     private final BlocksV1Api blocksV1Api;
     private final CouplingsV1Api couplingsV1Api;
+    private final AlbumsV1Api albumsV1Api;
 
     /**
      * Client builder.
@@ -100,6 +103,7 @@ public class StampsClient {
         stampsV1Api = new StampsV1Api(defaultClient);
         blocksV1Api = new BlocksV1Api(defaultClient);
         couplingsV1Api = new CouplingsV1Api(defaultClient);
+        albumsV1Api = new AlbumsV1Api(defaultClient);
     }
 
     /* Regions */
@@ -112,6 +116,14 @@ public class StampsClient {
 
     public Either<ClientError, List<TagDTO>> getTags() {
         return call(tagsV1Api::getTags);
+    }
+
+    public Either<ClientError, TagDTO> postTag(TagDTO dto) {
+        return call(() -> tagsV1Api.postTag(dto));
+    }
+
+    public Either<ClientError, TagDTO> putTag(TagDTO dto) {
+        return call(() -> tagsV1Api.putTag(dto.getId(), dto));
     }
 
     /* Images */
@@ -139,8 +151,10 @@ public class StampsClient {
 
     /* Issues */
 
-    public Either<ClientError, List<IssueDTO>> getIssues(String region, int yearStart, int yearEnd) {
-        return call(() -> issuesV1Api.getIssues(region, yearStart, yearEnd, null, null));
+    public Either<ClientError, List<IssueDTO>> getIssues(String region, Integer yearStart, Integer yearEnd,
+            String tags, String excludedTags)
+    {
+        return call(() -> issuesV1Api.getIssues(region, yearStart, yearEnd, tags, excludedTags));
     }
 
     public Either<ClientError, List<IssueDTO>> getIssues() {
@@ -175,6 +189,22 @@ public class StampsClient {
 
     public Either<ClientError, BlockDTO> patchBlock(UUID id, ItemPatchDTO patch) {
         return call(() -> blocksV1Api.patchBlock(id, patch));
+    }
+
+    //
+
+    /* Albums */
+
+    public Either<ClientError, List<AlbumDTO>> getAlbums() {
+        return call(albumsV1Api::getAlbums);
+    }
+
+    public Either<ClientError, AlbumDTO> postAlbum(AlbumDTO album) {
+        return call(() -> albumsV1Api.postAlbum(album));
+    }
+
+    public Either<ClientError, AlbumDTO> putAlbum(AlbumDTO album) {
+        return call(() -> albumsV1Api.putAlbum(album.getId(), album));
     }
 
     //

@@ -12,6 +12,8 @@ public final class Shortcuts {
     public static final KeyCodeCombination SHORTCUT_E = new KeyCodeCombination(KeyCode.E, SHORTCUT_DOWN);
     public static final KeyCodeCombination SHORTCUT_N = new KeyCodeCombination(KeyCode.N, SHORTCUT_DOWN);
 
+    public static final KeyCodeCombination SHORTCUT_ALT_B = new KeyCodeCombination(KeyCode.B, SHORTCUT_DOWN, ALT_DOWN);
+    public static final KeyCodeCombination SHORTCUT_ALT_C = new KeyCodeCombination(KeyCode.C, SHORTCUT_DOWN, ALT_DOWN);
     public static final KeyCodeCombination SHORTCUT_ALT_I = new KeyCodeCombination(KeyCode.I, SHORTCUT_DOWN, ALT_DOWN);
 
     private Shortcuts() {

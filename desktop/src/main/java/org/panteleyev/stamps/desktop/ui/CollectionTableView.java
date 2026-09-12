@@ -2,11 +2,13 @@
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.stamps.desktop.ui;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.scene.control.TableView;
 import org.panteleyev.fx.factories.TableFactory;
+import org.panteleyev.stamps.desktop.model.CollectionItem;
 import org.panteleyev.stamps.desktop.ui.table.ItemCommentCell;
 import org.panteleyev.stamps.desktop.ui.table.ItemDenominationCell;
 import org.panteleyev.stamps.desktop.ui.table.ItemDescriptionCell;
@@ -18,9 +20,7 @@ import org.panteleyev.stamps.desktop.ui.table.ItemNumberZagCell;
 import org.panteleyev.stamps.desktop.ui.table.ItemReplacementRequiredCell;
 import org.panteleyev.stamps.desktop.ui.table.ItemTableRow;
 import org.panteleyev.stamps.desktop.ui.table.ItemYearCell;
-import org.panteleyev.stamps.desktop.model.CollectionItem;
 import org.panteleyev.stamps.dto.IssueDTO;
-import org.panteleyev.stamps.dto.RegionDTO;
 
 import java.util.Collection;
 import java.util.List;
@@ -32,12 +32,12 @@ import static org.panteleyev.stamps.desktop.util.DtoUtils.ISSUE_COMPARATOR_BY_DA
 public class CollectionTableView extends TableView<CollectionItem> {
     private final ObservableList<CollectionItem> list = FXCollections.observableArrayList();
 
-    private CollectionItem.YearRangePredicate yearRangePredicate = new CollectionItem.YearRangePredicate(0, 0);
-    private Predicate<CollectionItem> tableItemPredicate = x -> true;
-
-    private final FilteredList<CollectionItem> filteredList = list.filtered(yearRangePredicate.and(tableItemPredicate));
+    private final ObjectProperty<Predicate<CollectionItem>> tableItemPredicateProperty =
+            new SimpleObjectProperty<>(_ -> true);
 
     public CollectionTableView() {
+        var filteredList = list.filtered(tableItemPredicateProperty.get());
+        filteredList.predicateProperty().bind(tableItemPredicateProperty);
         setItems(filteredList);
 
         var w = widthProperty().subtract(20);
@@ -98,10 +98,7 @@ public class CollectionTableView extends TableView<CollectionItem> {
         setRowFactory(_ -> new ItemTableRow());
     }
 
-    public void setIssues(Collection<IssueDTO> issues, RegionDTO region) {
-        yearRangePredicate = new CollectionItem.YearRangePredicate(region.getYearStart(), region.getYearEnd());
-        filteredList.setPredicate(yearRangePredicate.and(x -> true));
-
+    public void setIssues(Collection<IssueDTO> issues) {
         list.clear();
         issues.stream()
                 .sorted(ISSUE_COMPARATOR_BY_DATE)
@@ -120,37 +117,20 @@ public class CollectionTableView extends TableView<CollectionItem> {
     }
 
     public void showAll() {
-        tableItemPredicate = _ -> true;
-        updatePredicate();
+        tableItemPredicateProperty.set(_ -> true);
+    }
+
+    public void showPresent() {
+        tableItemPredicateProperty.set(x -> x.getHasClean() || x.getHasCancelled());
     }
 
     public void showMissing() {
-        tableItemPredicate = x -> !x.getHasCancelled()
+        tableItemPredicateProperty.set(x -> !x.getHasCancelled()
                 && !x.getHasClean()
-                && !x.getReplacementRequired();
-        updatePredicate();
+                && !x.getReplacementRequired());
     }
 
     public void showReplacement() {
-        tableItemPredicate = CollectionItem::getHasCancelled;
-        updatePredicate();
-    }
-
-    public void setStartYear(int year) {
-        yearRangePredicate = new CollectionItem.YearRangePredicate(year, yearRangePredicate.endYear());
-        updatePredicate();
-    }
-
-    public void setEndYear(int year) {
-        yearRangePredicate = new CollectionItem.YearRangePredicate(yearRangePredicate.startYear(), year);
-        updatePredicate();
-    }
-
-    public void setYearRange(int startYear, int endYear) {
-        yearRangePredicate = new CollectionItem.YearRangePredicate(startYear, endYear);
-    }
-
-    private void updatePredicate() {
-        filteredList.setPredicate(yearRangePredicate.and(tableItemPredicate));
+        tableItemPredicateProperty.set(CollectionItem::getHasCancelled);
     }
 }

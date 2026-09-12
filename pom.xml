@@ -12,7 +12,7 @@
     <name>Stamps</name>
 
     <properties>
-        <revision>26.9.2</revision>
+        <revision>26.9.3</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>26</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
@@ -145,12 +145,6 @@
                 <version>${javaFunctionalVersion}</version>
             </dependency>
             <!-- Test -->
-<!--            <dependency>-->
-<!--                <groupId>org.openjfx</groupId>-->
-<!--                <artifactId>javafx-swing</artifactId>-->
-<!--                <version>${javaFxVersion}</version>-->
-<!--                <scope>test</scope>-->
-<!--            </dependency>-->
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>

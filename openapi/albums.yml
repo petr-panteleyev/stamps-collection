@@ -1,0 +1,133 @@
+openapi: "3.0.0"
+
+info:
+  title: Albums
+  version: 1.0.0
+
+paths:
+  /api/v1/albums:
+    get:
+      tags:
+        - 'albums, v1'
+      summary: 'Get the list of albums'
+      operationId: getAlbums
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AlbumDTO'
+    post:
+      tags:
+        - 'albums, v1'
+      summary: 'Create album'
+      operationId: postAlbum
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlbumDTO'
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/AlbumDTO'
+
+  /api/v1/albums/{id}:
+    delete:
+      tags:
+        - 'albums, v1'
+      summary: 'Delete album'
+      operationId: deleteAlbum
+      parameters:
+        - name: id
+          description: 'ID of the album'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: 'Success, no content'
+
+    put:
+      tags:
+        - 'albums, v1'
+      summary: 'Upload an album'
+      operationId: putAlbum
+      parameters:
+        - name: id
+          description: 'ID of the album'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlbumDTO'
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/AlbumDTO'
+
+components:
+  schemas:
+    AlbumDTO:
+      type: object
+      required:
+        - name
+        - region
+        - subalbums
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: 'Primary key'
+        name:
+          type: string
+          description: 'Section name'
+          nullable: false
+        region:
+          type: string
+          description: 'Album region'
+          nullable: false
+        startYear:
+          type: integer
+          description: 'Start year of stamp issues'
+        endYear:
+          type: integer
+          description: 'Final year of stamp issues'
+        noTags:
+          type: boolean
+          description: 'If this album contains only items with no tags'
+        tags:
+          type: array
+          description: 'Album tags'
+          items:
+            type: string
+        excludedTags:
+          type: array
+          description: 'Album excluded tags'
+          items:
+            type: string
+        subalbums:
+          type: array
+          nullable: false
+          items:
+            $ref: '#/components/schemas/AlbumDTO'

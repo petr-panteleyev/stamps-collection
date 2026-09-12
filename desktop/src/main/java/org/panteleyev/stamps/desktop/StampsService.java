@@ -7,6 +7,7 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.image.Image;
 import org.panteleyev.stamps.client.StampsClient;
+import org.panteleyev.stamps.dto.AlbumDTO;
 import org.panteleyev.stamps.dto.BlockDTO;
 import org.panteleyev.stamps.dto.CouplingDTO;
 import org.panteleyev.stamps.dto.ImageUploadDTO;
@@ -18,26 +19,19 @@ import org.panteleyev.stamps.dto.TagDTO;
 
 import java.io.ByteArrayInputStream;
 import java.time.Duration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static org.panteleyev.stamps.desktop.util.DtoUtils.ISSUE_COMPARATOR_BY_DATE;
+import static org.panteleyev.stamps.desktop.util.DtoUtils.normalize;
 
 public class StampsService {
     private final Lock lock = new ReentrantLock();
 
     private StampsClient client = null;
-
-    private final List<RegionDTO> regions = new CopyOnWriteArrayList<>();
-    private final List<TagDTO> tags = new CopyOnWriteArrayList<>();
-    private final Map<UUID, IssueDTO> issues = new HashMap<>();
 
     private final BooleanProperty connectedProperty = new SimpleBooleanProperty(false);
 
@@ -46,28 +40,10 @@ public class StampsService {
     public void init(String serverUrl) {
         lock.lock();
         try {
-            var client = new StampsClient.Builder()
+            this.client = new StampsClient.Builder()
                     .withServerUrl(serverUrl)
                     .withConnectTimeout(Duration.ofSeconds(1))
                     .build();
-
-            regions.clear();
-            client.getRegions().onRight(regions::addAll).onLeft(error -> {
-                throw new RuntimeException(error.toString());
-            });
-
-            tags.clear();
-            client.getTags().onRight(tags::addAll).onLeft(error -> {
-                throw new RuntimeException(error.toString());
-            });
-
-            issues.clear();
-            client.getIssues()
-                    .onRight(list -> list.forEach(item -> issues.put(item.getId(), item)))
-                    .onLeft(error -> {
-                        throw new RuntimeException(error.toString());
-                    });
-            this.client = client;
             connectedProperty.set(true);
         } finally {
             lock.unlock();
@@ -78,21 +54,58 @@ public class StampsService {
         return connectedProperty;
     }
 
-    public List<TagDTO> getTags() {
-        return tags;
-    }
-
-    public List<RegionDTO> getRegions() {
-        return regions;
-    }
-
-    public List<IssueDTO> getIssues(String region) {
+    public List<RegionDTO> loadRegions() {
         lock.lock();
         try {
-            return issues.values().stream()
-                    .filter(i -> Objects.equals(i.getRegion(), region))
-                    .sorted(ISSUE_COMPARATOR_BY_DATE)
-                    .toList();
+            return client.getRegions().right().orElseThrow();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public List<TagDTO> loadTags() {
+        lock.lock();
+        try {
+            return client.getTags().right().orElseThrow();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public TagDTO createTag(TagDTO tag) {
+        lock.lock();
+        try {
+            return client.postTag(tag).right().orElseThrow();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public TagDTO updateTag(TagDTO tag) {
+        lock.lock();
+        try {
+            return client.putTag(tag).right().orElseThrow();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public List<IssueDTO> loadIssues(AlbumDTO album) {
+        lock.lock();
+
+        try {
+            var tags = "";
+            if (!normalize(album.getNoTags())) {
+                if (album.getTags() == null || album.getTags().isEmpty()) {
+                    tags = null;
+                } else {
+                    tags = String.join(",", album.getTags());
+                }
+            }
+            var excludedTags = String.join(",", normalize(album.getExcludedTags()));
+
+            return client.getIssues(album.getRegion(), album.getStartYear(), album.getEndYear(), tags, excludedTags)
+                    .right().orElseThrow();
         } finally {
             lock.unlock();
         }
@@ -101,9 +114,7 @@ public class StampsService {
     public IssueDTO createIssue(IssueDTO issue) {
         lock.lock();
         try {
-            var created = client.postIssue(issue).right().orElseThrow();
-            issues.put(created.getId(), created);
-            return created;
+            return client.postIssue(issue).right().orElseThrow();
         } finally {
             lock.unlock();
         }
@@ -112,9 +123,7 @@ public class StampsService {
     public IssueDTO updateIssue(IssueDTO issue) {
         lock.lock();
         try {
-            var updated = client.putIssue(issue).right().orElseThrow();
-            issues.put(updated.getId(), updated);
-            return updated;
+            return client.putIssue(issue).right().orElseThrow();
         } finally {
             lock.unlock();
         }
@@ -125,7 +134,6 @@ public class StampsService {
         try {
             var result = client.deleteIssue(issue.getId());
             if (result.isLeft()) throw new RuntimeException();
-            issues.remove(issue.getId());
         } finally {
             lock.unlock();
         }
@@ -163,6 +171,39 @@ public class StampsService {
         try {
             var result = client.uploadImage(id, dto).right().orElseThrow();
             imageCache.remove(result.getId());
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public List<AlbumDTO> loadAlbums() {
+        lock.lock();
+        try {
+            return client.getAlbums().onLeft(error -> {
+                throw new RuntimeException(error.toString());
+            }).right().orElseThrow();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public AlbumDTO createAlbum(AlbumDTO album) {
+        lock.lock();
+        try {
+            return client.postAlbum(album).onLeft(error -> {
+                throw new RuntimeException(error.toString());
+            }).right().orElseThrow();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public AlbumDTO updateAlbum(AlbumDTO album) {
+        lock.lock();
+        try {
+            return client.putAlbum(album).onLeft(error -> {
+                throw new RuntimeException(error.toString());
+            }).right().orElseThrow();
         } finally {
             lock.unlock();
         }

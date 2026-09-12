@@ -33,7 +33,7 @@ public class ItemImageCell extends TableCell<CollectionItem, CollectionItem> {
             var tooltip = new Tooltip();
             var tpView = new ImageView(image);
             tpView.setPreserveRatio(true);
-            if (item.isBlock()) {
+            if (item.isBlock() || item.isCoupling()) {
                 tpView.setFitWidth(TOOLTIP_BLOCK_IMAGE_SIZE);
                 tpView.setFitHeight(TOOLTIP_BLOCK_IMAGE_SIZE);
             } else {

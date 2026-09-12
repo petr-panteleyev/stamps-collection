@@ -8,14 +8,12 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioButton;
-import javafx.scene.control.Separator;
 import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
@@ -28,12 +26,15 @@ import org.panteleyev.stamps.desktop.model.CollectionItem;
 import org.panteleyev.stamps.desktop.profiles.ConnectDialog;
 import org.panteleyev.stamps.desktop.profiles.ConnectionProfile;
 import org.panteleyev.stamps.desktop.profiles.ConnectionProfileManager;
+import org.panteleyev.stamps.desktop.ui.albums.AlbumsEditor;
+import org.panteleyev.stamps.desktop.ui.tags.TagsEditor;
+import org.panteleyev.stamps.dto.AlbumDTO;
 import org.panteleyev.stamps.dto.ImageUploadDTO;
 import org.panteleyev.stamps.dto.IssueDTO;
-import org.panteleyev.stamps.dto.RegionDTO;
 
 import javax.imageio.ImageIO;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -43,27 +44,29 @@ import java.util.List;
 import java.util.ListResourceBundle;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static javafx.scene.control.Alert.AlertType.CONFIRMATION;
 import static javafx.scene.control.ButtonType.CANCEL;
 import static javafx.scene.control.ButtonType.OK;
+import static org.panteleyev.functional.Scope.apply;
 import static org.panteleyev.fx.FxAction.ACTION_SEPARATOR;
 import static org.panteleyev.fx.FxAction.fxAction;
-import static org.panteleyev.fx.factories.ComboBoxFactory.comboBox;
-import static org.panteleyev.fx.factories.ComboBoxFactory.comboBoxListCell;
 import static org.panteleyev.fx.factories.FileChooserFactory.fileChooser;
 import static org.panteleyev.fx.factories.MenuFactory.menu;
 import static org.panteleyev.fx.factories.MenuFactory.menuBar;
 import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.stamps.desktop.GlobalContext.stampsService;
 import static org.panteleyev.stamps.desktop.settings.Settings.settings;
+import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_ALT_B;
+import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_ALT_I;
 import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.stamps.desktop.ui.Styles.TOOLTIP_BLOCK_IMAGE_SIZE;
 import static org.panteleyev.stamps.desktop.ui.Styles.TOOLTIP_STAMP_IMAGE_SIZE;
+import static org.panteleyev.stamps.desktop.util.DtoUtils.ALBUM_COMPARATOR_BY_NAME;
 import static org.panteleyev.stamps.desktop.util.DtoUtils.ISSUE_COMPARATOR_BY_DATE;
-import static org.panteleyev.stamps.desktop.util.DtoUtils.REGION_COMPATAOR_BY_NAME;
 import static org.panteleyev.stamps.desktop.util.DtoUtils.copy;
 
 public class MainWindowController extends BaseController {
@@ -83,23 +86,18 @@ public class MainWindowController extends BaseController {
 
     private final CollectionTableView view = new CollectionTableView();
 
-    private final ComboBox<RegionDTO> regionComboBox = comboBox(List.of(),
-            _ -> comboBoxListCell("-", RegionDTO::getName));
-
-    private static final int CURRENT_YEAR = LocalDate.now().getYear();
-
     private final RadioButton showAllRadio = new RadioButton("Все");
+    private final RadioButton showPresentRadio = new RadioButton("В наличии");
     private final RadioButton showMissingRadio = new RadioButton("Манколист");
     private final RadioButton showReplacementRadio = new RadioButton("На замену");
-
-    private final Spinner<Integer> startYearSpinner = new Spinner<>(CURRENT_YEAR, CURRENT_YEAR, CURRENT_YEAR);
-    private final Spinner<Integer> endYearSpinner = new Spinner<>(CURRENT_YEAR, CURRENT_YEAR, CURRENT_YEAR);
 
     // Action enable flags
     private final BooleanProperty newIssueEnabled = new SimpleBooleanProperty(false);
     private final BooleanProperty editIssueEnabled = new SimpleBooleanProperty(false);
     private final BooleanProperty deleteIssueEnabled = new SimpleBooleanProperty(false);
     private final BooleanProperty uploadImageEnabled = new SimpleBooleanProperty(false);
+    private final BooleanProperty tagsEditorEnabled = new SimpleBooleanProperty(false);
+    private final BooleanProperty editAlbumsEnabled = new SimpleBooleanProperty(false);
 
     // Actions
     private final FxAction newIssueAction = fxAction("Новый выпуск...")
@@ -110,13 +108,19 @@ public class MainWindowController extends BaseController {
             .onAction(this::onDeleteIssue).disableBinding(deleteIssueEnabled.not());
     private final FxAction uploadImageAction = fxAction("Загрузить изображение...")
             .onAction(this::onUploadImage).accelerator(SHORTCUT_ALT_I).disableBinding(uploadImageEnabled.not());
+    private final FxAction editTagsAction = fxAction("Теги")
+            .onAction(this::onEditTags).disableBinding(tagsEditorEnabled.not());
+
+    private final AtomicReference<String> imageDirectory = new AtomicReference<>(null);
+
+    private AlbumDTO currentAlbum = null;
+
+    private final Menu albumMenu = menu("Альбомы");
 
     public MainWindowController(Stage stage) {
         super(stage, settings().getMainCssFilePath());
 
         profileManager.loadProfiles();
-
-        newIssueEnabled.bind(stampsService().connectedProperty());
 
         var center = new BorderPane(view);
         center.setTop(createToolBar());
@@ -126,12 +130,6 @@ public class MainWindowController extends BaseController {
 
         setupWindow(content);
 
-        regionComboBox.setOnAction(_ -> onRegionChange());
-        startYearSpinner.setEditable(true);
-        startYearSpinner.getValueFactory().valueProperty().addListener((_, _, newValue) -> view.setStartYear(newValue));
-        endYearSpinner.setEditable(true);
-        endYearSpinner.getValueFactory().valueProperty().addListener((_, _, newValue) -> view.setEndYear(newValue));
-
         view.getSelectionModel().selectedItemProperty().addListener((_, _, newValue) -> onSelectedRow(newValue));
         view.setContextMenu(createContextMenu());
 
@@ -140,7 +138,11 @@ public class MainWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        return "Коллекция марок";
+        var title = "Коллекция марок";
+        if (currentAlbum != null) {
+            title += " - " + currentAlbum.getName();
+        }
+        return title;
     }
 
     @Override
@@ -151,6 +153,7 @@ public class MainWindowController extends BaseController {
 
     private MenuBar createMenuBar() {
         var connectMenuItem = menuItem("Соединение...", this::onConnect);
+        connectMenuItem.setAccelerator(SHORTCUT_ALT_C);
         var fileMenu = menu("Файл",
                 connectMenuItem,
                 new SeparatorMenuItem(),
@@ -162,13 +165,20 @@ public class MainWindowController extends BaseController {
                 new SeparatorMenuItem(),
                 deleteIssueAction.createMenuItem(),
                 new SeparatorMenuItem(),
-                uploadImageAction.createMenuItem()
+                uploadImageAction.createMenuItem(),
+                new SeparatorMenuItem(),
+                editTagsAction.createMenuItem()
         );
+
+        var editAlbumsMenuItem = menuItem("Редактировать альбомы", this::onEditAlbums);
+        editAlbumsMenuItem.disableProperty().bind(editAlbumsEnabled.not());
+        editAlbumsMenuItem.setAccelerator(SHORTCUT_ALT_B);
+        albumMenu.getItems().add(editAlbumsMenuItem);
 
         var profilesMenuItem = menuItem("Профили", this::onProfiles);
         var serviceMenu = menu("Сервис", profilesMenuItem);
 
-        return menuBar(fileMenu, editMenu, serviceMenu);
+        return menuBar(fileMenu, editMenu, albumMenu, serviceMenu);
     }
 
     private ContextMenu createContextMenu() {
@@ -180,38 +190,69 @@ public class MainWindowController extends BaseController {
         );
     }
 
+    private void buildAlbumMenu() {
+        var albumMenuSize = albumMenu.getItems().size();
+        for (var index = 1; index < albumMenuSize; index++) {
+            albumMenu.getItems().removeLast();
+        }
+
+        var albums = stampsService().loadAlbums().stream()
+                .sorted(ALBUM_COMPARATOR_BY_NAME)
+                .toList();
+        if (albums.isEmpty()) return;
+
+        albumMenu.getItems().add(new SeparatorMenuItem());
+
+        for (var album : albums) {
+            if (album.getSubalbums().isEmpty()) {
+                albumMenu.getItems().add(albumMenuItem(album));
+            } else {
+                var menu = menu(album.getName());
+                albumMenu.getItems().add(menu);
+                menu.getItems().addAll(albumMenuItem(album), new SeparatorMenuItem());
+                for (var subalbum : album.getSubalbums()) {
+                    menu.getItems().add(albumMenuItem(subalbum));
+                }
+            }
+        }
+    }
+
+    private MenuItem albumMenuItem(AlbumDTO album) {
+        return menuItem(album.getName(), _ -> onAlbum(album));
+    }
+
     private Node createToolBar() {
         var group = new ToggleGroup();
         showAllRadio.setToggleGroup(group);
+        showPresentRadio.setToggleGroup(group);
         showMissingRadio.setToggleGroup(group);
         showReplacementRadio.setToggleGroup(group);
-        showAllRadio.setSelected(true);
+        showPresentRadio.setSelected(true);
 
         showAllRadio.setOnAction(_ -> view.showAll());
+        showPresentRadio.setOnAction(_ -> view.showPresent());
         showMissingRadio.setOnAction(_ -> view.showMissing());
         showReplacementRadio.setOnAction(_ -> view.showReplacement());
 
-        return new ToolBar(regionComboBox,
-                new Separator(),
-                startYearSpinner, endYearSpinner,
-                new Separator(),
-                showAllRadio, showMissingRadio, showReplacementRadio
-        );
+        return new ToolBar(showPresentRadio, showMissingRadio, showReplacementRadio, showAllRadio);
+    }
+
+    private void onAlbum(AlbumDTO album) {
+        currentAlbum = album;
+        getStage().setTitle(getTitle());
+        loadData();
+        onSelectedRow(null);
+        showPresentRadio.fire();
+        view.showPresent();
     }
 
     private void loadData() {
-        var region = regionComboBox.getSelectionModel().getSelectedItem();
-        var issues = stampsService().getIssues(region.getName()).stream()
-                .sorted(ISSUE_COMPARATOR_BY_DATE)
-                .toList();
-        view.setIssues(issues, region);
+        view.setIssues(stampsService().loadIssues(currentAlbum));
     }
 
     private void onNewIssue(ActionEvent ignored) {
-        var region = regionComboBox.getSelectionModel().getSelectedItem();
-
         var newIssue = new IssueDTO()
-                .region(region.getName())
+                .region(currentAlbum.getRegion())
                 .title("Новый выпуск")
                 .date(LocalDate.now());
 
@@ -248,8 +289,14 @@ public class MainWindowController extends BaseController {
         var selected = view.getSelectionModel().getSelectedItem();
         if (selected == null || selected.isIssue()) return;
 
-        var file = fileChooser("Открыть", List.of(IMAGE_EXTENSION_FILTER)).showOpenDialog(getStage());
+        var file = apply(fileChooser("Открыть", List.of(IMAGE_EXTENSION_FILTER)), fileChooser -> {
+            if (imageDirectory.get() != null) {
+                fileChooser.setInitialDirectory(new File(imageDirectory.get()));
+            }
+        }).showOpenDialog(getStage());
         if (file == null) return;
+
+        imageDirectory.set(file.getParent());
 
         var dimension = selected.isStamp() ? TOOLTIP_STAMP_IMAGE_SIZE : TOOLTIP_BLOCK_IMAGE_SIZE;
 
@@ -271,6 +318,22 @@ public class MainWindowController extends BaseController {
         }
     }
 
+    private void onEditTags(ActionEvent ignored) {
+        new TagsEditor().showAndWait();
+    }
+
+    private void onEditAlbums(ActionEvent ignored) {
+        new AlbumsEditor().showAndWait().ifPresent(result -> {
+            for (var update : result.toUpdate()) {
+                stampsService().updateAlbum(update);
+            }
+            for (var create : result.toAdd()) {
+                stampsService().createAlbum(create);
+            }
+            buildAlbumMenu();
+        });
+    }
+
     private Optional<IssueDTO> getParentIssueDTO(CollectionItem collectionItem) {
         if (collectionItem == null) return Optional.empty();
         return Optional.of(collectionItem.getParent());
@@ -287,52 +350,29 @@ public class MainWindowController extends BaseController {
 
     private void open(ConnectionProfile profile) {
         stampsService().init(profile.serverUrl());
-        regionComboBox.getItems().addAll(
-                stampsService().getRegions().stream()
-                        .sorted(REGION_COMPATAOR_BY_NAME)
-                        .toList()
-        );
-        if (!regionComboBox.getItems().isEmpty()) {
-            regionComboBox.getSelectionModel().selectLast();
-        }
+        buildAlbumMenu();
+        onSelectedRow(null);
     }
 
     private void onExit() {
         getStage().fireEvent(new WindowEvent(getStage(), WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
-    private void onRegionChange() {
-        var region = regionComboBox.getValue();
-        if (region == null) return;
-
-        var endYear = region.getYearEnd() == null ? CURRENT_YEAR : region.getYearEnd();
-        showAllRadio.setSelected(true);
-
-        if (startYearSpinner.getValueFactory() instanceof SpinnerValueFactory.IntegerSpinnerValueFactory factory) {
-            factory.setMin(region.getYearStart());
-            factory.setMax(endYear);
-            factory.setValue(region.getYearStart());
-        }
-
-        if (endYearSpinner.getValueFactory() instanceof SpinnerValueFactory.IntegerSpinnerValueFactory factory) {
-            factory.setMin(region.getYearStart());
-            factory.setMax(endYear);
-            factory.setValue(endYear);
-        }
-
-        loadData();
-    }
-
     private void onSelectedRow(CollectionItem selected) {
-        if (!stampsService().connectedProperty().get()) {
+        tagsEditorEnabled.set(stampsService().connectedProperty().get());
+        editAlbumsEnabled.set(stampsService().connectedProperty().get());
+
+        if (!stampsService().connectedProperty().get() || currentAlbum == null) {
+            newIssueEnabled.set(false);
             editIssueEnabled.set(false);
             deleteIssueEnabled.set(false);
             uploadImageEnabled.set(false);
         } else {
+            newIssueEnabled.set(true);
             editIssueEnabled.set(selected != null);
             deleteIssueEnabled.set(selected != null && selected.isIssue());
             uploadImageEnabled.set(
-                    selected != null && (selected.isStamp() || selected.isBlock())
+                    selected != null && !selected.isIssue()
             );
         }
     }
