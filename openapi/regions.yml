@@ -1,7 +1,7 @@
 openapi: '3.0.0'
 
 info:
-  title: Regions
+  title: Регионы
   version: 1.0.0
 
 paths:
@@ -9,7 +9,7 @@ paths:
     get:
       tags:
         - 'regions, v1'
-      summary: 'Get the list of all regions'
+      summary: 'Получить список регионов'
       operationId: getRegions
       responses:
         "200":
@@ -24,7 +24,7 @@ paths:
     post:
       tags:
         - 'regions, v1'
-      summary: 'Create new region'
+      summary: 'Создать новый регион'
       operationId: postRegion
       requestBody:
         required: true
@@ -57,21 +57,25 @@ components:
 
     RegionDTO:
       type: object
-      description: 'Region of stamp issue (РСФСР, СССР, Россия, Тува, USA, etc.)'
+      description: 'Регион выпуска (РСФСР, СССР, Россия, etc.)'
       required:
         - name
-        - yearStart
+        - startYear
       properties:
         id:
           type: string
           format: uuid
-          description: 'Primary key'
+          description: 'Идентификатор региона'
+          nullable: true
         name:
           type: string
-          description: 'Unique region name'
-        yearStart:
+          description: 'Название региона'
+          nullable: false
+        startYear:
           type: integer
-          description: 'Start year of stamp issues'
-        yearEnd:
+          description: 'Год первого выпуска'
+          nullable: false
+        endYear:
           type: integer
-          description: 'Final year of stamp issues'
+          description: 'Год последнего выпуска'
+          nullable: true

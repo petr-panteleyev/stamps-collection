@@ -43,6 +43,7 @@ public class StampConverterTest {
                                 .hasCancelled(true)
                                 .hasClean(true)
                                 .replacementRequired(true)
+                                .noPerforation(true)
                                 .tags(List.of("Tag1", "Tag3")),
                         new IssueEntity().setId(ISSUE_ENTITY_ID).setYear(2026),
                         Set.of(TAG_1, TAG_2, TAG_3),
@@ -58,6 +59,7 @@ public class StampConverterTest {
                                 .setHasCancelled(true)
                                 .setHasClean(true)
                                 .setReplacementRequired(true)
+                                .setNoPerforation(true)
                                 .setTags(Set.of(TAG_1, TAG_3))
                 )
         );
@@ -83,6 +85,8 @@ public class StampConverterTest {
         assertThat(actual.getHasCancelled()).isEqualTo(expected.getHasCancelled());
         assertThat(actual.getReplacementRequired()).isEqualTo(expected.getReplacementRequired());
 
+        assertThat(actual.getNoPerforation()).isEqualTo(expected.getNoPerforation());
+
         assertThat(actual.getTags()).containsExactlyInAnyOrderElementsOf(expected.getTags());
 
         assertThat(actual.getBlockNumber()).isNull();
@@ -105,6 +109,7 @@ public class StampConverterTest {
                                 .setHasCancelled(true)
                                 .setHasClean(true)
                                 .setReplacementRequired(true)
+                                .setNoPerforation(true)
                                 .setBlockNumber(3000)
                                 .setTags(Set.of(TAG_1, TAG_3)),
                         new StampDTO()
@@ -118,6 +123,7 @@ public class StampConverterTest {
                                 .hasCancelled(true)
                                 .hasClean(true)
                                 .replacementRequired(true)
+                                .noPerforation(true)
                                 .blockNumber(3000)
                                 .tags(List.of("Tag1", "Tag3"))
                 )

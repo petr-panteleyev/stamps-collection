@@ -38,6 +38,8 @@ import static org.panteleyev.stamps.desktop.ui.MainWindowController.UI;
 import static org.panteleyev.stamps.desktop.util.DtoUtils.ALBUM_COMPARATOR_BY_NAME;
 
 public class AlbumsEditor extends BaseDialog<AlbumEditorResult> {
+    private final static int INITIAL_WIDTH = 1024;
+
     private final TreeTableView<AlbumDTO> view = new TreeTableView<>();
     private final TreeItem<AlbumDTO> rootItem = new TreeItem<>();
 
@@ -62,7 +64,7 @@ public class AlbumsEditor extends BaseDialog<AlbumEditorResult> {
         getDialogPane().setContent(root);
         createDefaultButtons(UI);
 
-        var newAlbumButtonType = buttonType("Новый альбом", ButtonBar.ButtonData.LEFT);
+        var newAlbumButtonType = buttonType("Создать", ButtonBar.ButtonData.LEFT);
         var editAlbumButtonType = buttonType("Редактировать", ButtonBar.ButtonData.LEFT);
         getDialogPane().getButtonTypes().addAll(newAlbumButtonType, editAlbumButtonType);
 
@@ -75,10 +77,12 @@ public class AlbumsEditor extends BaseDialog<AlbumEditorResult> {
             if (buttonType != ButtonType.OK) return null;
             return new AlbumEditorResult(toAdd.values(), toUpdate.values(), toDelete.values());
         });
+
+        setWidth(INITIAL_WIDTH);
     }
 
     private void setupView() {
-        var newAlbumMenuItem = menuItem("Новый альбом", this::onNewAlbum);
+        var newAlbumMenuItem = menuItem("Создать", this::onNewAlbum);
         newAlbumMenuItem.setAccelerator(Shortcuts.SHORTCUT_N);
         var editAlbumMenuItem = menuItem("Редактировать...", this::onEditAlbum);
         editAlbumMenuItem.setAccelerator(Shortcuts.SHORTCUT_E);
@@ -92,23 +96,31 @@ public class AlbumsEditor extends BaseDialog<AlbumEditorResult> {
         );
         view.setContextMenu(menu);
 
+        var w = view.widthProperty().subtract(10);
+
         var nameColumn = TreeTableFactory.<AlbumDTO>treeTableObjectColumn("Название");
         nameColumn.setCellFactory(_ -> new AlbumNameCell());
+        nameColumn.widthBinding(w.multiply(0.25));
 
         var regionColumn = TreeTableFactory.<AlbumDTO>treeTableObjectColumn("Регион");
         regionColumn.setCellFactory(_ -> new AlbumRegionCell());
+        regionColumn.widthBinding(w.multiply(0.1));
 
         var startYearColumn = TreeTableFactory.<AlbumDTO>treeTableObjectColumn("Начало");
         startYearColumn.setCellFactory(_ -> new AlbumStartYearCell());
+        startYearColumn.widthBinding(w.multiply(0.05));
 
         var endYearColumn = TreeTableFactory.<AlbumDTO>treeTableObjectColumn("Конец");
         endYearColumn.setCellFactory(_ -> new AlbumEndYearCell());
+        endYearColumn.widthBinding(w.multiply(0.05));
 
         var tagsColumn = TreeTableFactory.<AlbumDTO>treeTableObjectColumn("Теги");
         tagsColumn.setCellFactory(_ -> new AlbumTagsCell());
+        tagsColumn.widthBinding(w.multiply(0.25));
 
         var excludedTagsColumn = TreeTableFactory.<AlbumDTO>treeTableObjectColumn("Искл. теги");
         excludedTagsColumn.setCellFactory(_ -> new AlbumExcludedTagsCell());
+        excludedTagsColumn.widthBinding(w.multiply(0.3));
 
         view.getColumns().setAll(List.of(
                 nameColumn,
@@ -140,8 +152,7 @@ public class AlbumsEditor extends BaseDialog<AlbumEditorResult> {
 
         var selected = view.getSelectionModel().getSelectedItem();
         var album = new AlbumDTO()
-                .name("Новый альбом")
-                .noTags(false);
+                .name("Новый альбом");
 
         AlbumDTO parent;
         if (selected == null) {

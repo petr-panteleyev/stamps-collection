@@ -3,7 +3,7 @@
 package org.panteleyev.stamps.desktop.ui;
 
 import org.controlsfx.control.CheckComboBox;
-import org.panteleyev.stamps.dto.TagDTO;
+import org.panteleyev.stamps.desktop.model.CollectionTag;
 
 import java.util.Collection;
 
@@ -11,9 +11,9 @@ public class TagComboBox extends CheckComboBox<String> {
     public TagComboBox() {
     }
 
-    public void setTags(Collection<TagDTO> tags) {
+    public void setTags(Collection<CollectionTag> tags) {
         getItems().setAll(tags.stream()
-                .map(TagDTO::getName)
+                .map(CollectionTag::name)
                 .sorted()
                 .toList()
         );

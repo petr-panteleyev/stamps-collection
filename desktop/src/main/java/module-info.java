@@ -1,5 +1,6 @@
 module stamps.desktop {
     exports org.panteleyev.stamps.desktop;
+    exports org.panteleyev.stamps.desktop.model;
 
     requires java.xml;
     requires org.panteleyev.freedesktop;
@@ -7,7 +8,6 @@ module stamps.desktop {
     requires org.panteleyev.fx;
     requires javafx.graphics;
     requires javafx.swing;
-    requires org.panteleyev.stamps.dto;
     requires stamps.client;
     requires org.controlsfx.controls;
     requires java.logging;

@@ -1,0 +1,2 @@
+ALTER TABLE issue
+    ALTER COLUMN issue_date SET NOT NULL;

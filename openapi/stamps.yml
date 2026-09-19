@@ -9,11 +9,11 @@ paths:
     get:
       tags:
         - 'stamps, v1'
-      summary: 'Get the stamp'
+      summary: 'Получить данные почтовой марки'
       operationId: getStamp
       parameters:
         - name: id
-          description: 'ID of the stamp'
+          description: 'Идентификатор почтовой марки'
           in: path
           required: true
           schema:
@@ -36,11 +36,11 @@ paths:
     patch:
       tags:
         - 'stamps, v1'
-      summary: 'Patch the stamp'
+      summary: 'Изменить данные почтовой марки'
       operationId: patchStamp
       parameters:
         - name: id
-          description: 'ID of the stamp'
+          description: 'Идентификатор почтовой маркиp'
           in: path
           required: true
           schema:
@@ -76,7 +76,7 @@ components:
 
     StampDTO:
       type: object
-      description: 'Postal stamp'
+      description: 'Почтовая марка'
       required:
         - numberZag
         - denomination
@@ -87,24 +87,28 @@ components:
       properties:
         year:
           type: integer
-          description: 'Year of stamp issue'
+          description: 'Год выпуска марки'
         numberZag:
           type: integer
-          description: 'Number from catalogue by V. Zagorsky'
+          description: 'Номер по каталогу Загорского'
+          nullable: false
         numberCfa:
           type: integer
-          description: 'Number from USSR official catalogue'
+          description: 'Номер по каталогу ЦФА (для СССР)'
         denomination:
           type: number
-          description: 'Denomination in region currency'
+          description: 'Номинал марки'
+          nullable: false
         description:
           type: string
-          description: 'Stamp description'
+          description: 'Описание'
+          nullable: false
         blockNumber:
           type: integer
-          description: 'numberZag of a block this stamp belongs to, ignored on input'
+          description: 'Для марки в блоке номер блока по каталогу Загорского'
         tags:
           type: array
-          description: 'Stamp tags'
+          description: 'Теги марки'
+          nullable: false
           items:
             type: string

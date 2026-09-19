@@ -10,8 +10,9 @@ import javafx.scene.control.TextField;
 import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
+import org.panteleyev.stamps.desktop.model.CollectionTag;
+import org.panteleyev.stamps.desktop.util.DtoUtils;
 import org.panteleyev.stamps.dto.StampDTO;
-import org.panteleyev.stamps.dto.TagDTO;
 
 import java.util.List;
 
@@ -23,7 +24,9 @@ import static org.panteleyev.fx.factories.grid.GridCell.gridCell;
 import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
 import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.stamps.desktop.GlobalContext.stampsService;
+import static org.panteleyev.stamps.desktop.settings.Settings.settings;
 import static org.panteleyev.stamps.desktop.ui.MainWindowController.UI;
+import static org.panteleyev.stamps.desktop.ui.Styles.GRID_PANE;
 import static org.panteleyev.stamps.desktop.ui.Validators.DECIMAL_VALIDATOR;
 import static org.panteleyev.stamps.desktop.ui.Validators.INTEGER_OR_ZERO_VALIDATOR;
 import static org.panteleyev.stamps.desktop.ui.Validators.INTEGER_VALIDATOR;
@@ -39,6 +42,7 @@ public class StampDialog extends BaseDialog<StampDTO> {
     private final TextField cfaNumberEdit = new TextField();
     private final TextField denominationEdit = new TextField();
     private final TextField descriptionEdit = new TextField();
+    private final CheckBox noPerforationCheckBox = new CheckBox("Без перфорации");
     private final CheckBox hasCleanCheckBox = new CheckBox("Чистая");
     private final CheckBox hasCancelledCheckBox = new CheckBox("Гашёная");
     private final CheckBox replacementCheckBox = new CheckBox("Требуется замена");
@@ -48,6 +52,8 @@ public class StampDialog extends BaseDialog<StampDTO> {
     private final ValidationSupport validation = new ValidationSupport();
 
     public StampDialog(StampDTO stamp) {
+        super(settings().getDialogCssFilePath());
+
         this.stamp = stamp;
 
         setTitle("Марка");
@@ -57,12 +63,14 @@ public class StampDialog extends BaseDialog<StampDTO> {
                 gridRow(label(string("Номер по ЦФА", COLON)), cfaNumberEdit),
                 gridRow(label(string("Номинал", COLON)), denominationEdit),
                 gridRow(label(string("Описание", COLON)), descriptionEdit),
+                gridRow(gridCell(noPerforationCheckBox, 2, 1)),
+                gridRow(label(string("Комментарий", COLON)), commentEdit),
+                gridRow(label(string("Теги", COLON)), tagsComboBox),
+                gridRow(gridCell(label("В наличии:"), 2, 1)),
                 gridRow(gridCell(hasCleanCheckBox, 2, 1)),
                 gridRow(gridCell(hasCancelledCheckBox, 2, 1)),
-                gridRow(gridCell(replacementCheckBox, 2, 1)),
-                gridRow(label(string("Комментарий", COLON)), commentEdit),
-                gridRow(label(string("Теги", COLON)), tagsComboBox)
-        ));
+                gridRow(gridCell(replacementCheckBox, 2, 1))
+        ), List.of(), List.of(GRID_PANE));
         getDialogPane().setContent(root);
 
         createDefaultButtons(UI);
@@ -76,6 +84,7 @@ public class StampDialog extends BaseDialog<StampDTO> {
                     .numberCfa(toIntOrNull(cfaNumberEdit.getText()))
                     .denomination(toBigDecimalOrNull(denominationEdit.getText()))
                     .description(descriptionEdit.getText())
+                    .noPerforation(noPerforationCheckBox.isSelected())
                     .hasClean(hasCleanCheckBox.isSelected())
                     .hasCancelled(hasCancelledCheckBox.isSelected())
                     .replacementRequired(replacementCheckBox.isSelected())
@@ -94,12 +103,13 @@ public class StampDialog extends BaseDialog<StampDTO> {
         cfaNumberEdit.setText(toStringOrEmpty(stamp.getNumberCfa()));
         denominationEdit.setText(toStringOrEmpty(stamp.getDenomination()));
         descriptionEdit.setText(stamp.getDescription());
-        hasCleanCheckBox.setSelected(stamp.getHasClean() != null && stamp.getHasClean());
-        hasCancelledCheckBox.setSelected(stamp.getHasCancelled() != null && stamp.getHasCancelled());
-        replacementCheckBox.setSelected(stamp.getReplacementRequired() != null && stamp.getReplacementRequired());
+        noPerforationCheckBox.setSelected(DtoUtils.normalize(stamp.getNoPerforation()));
+        hasCleanCheckBox.setSelected(DtoUtils.normalize(stamp.getHasClean()));
+        hasCancelledCheckBox.setSelected(DtoUtils.normalize(stamp.getHasCancelled()));
+        replacementCheckBox.setSelected(DtoUtils.normalize(stamp.getReplacementRequired()));
         commentEdit.setText(stamp.getComment());
 
-        var allTags = stampsService().loadTags().stream().map(TagDTO::getName).sorted().toList();
+        var allTags = stampsService().loadTags().stream().map(CollectionTag::name).sorted().toList();
         tagsComboBox.getItems().setAll(FXCollections.observableArrayList(allTags));
         for (var i = 0; i < allTags.size(); i++) {
             if (stamp.getTags().contains(allTags.get(i))) {

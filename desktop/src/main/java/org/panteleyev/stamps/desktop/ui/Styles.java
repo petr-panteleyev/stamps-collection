@@ -3,6 +3,7 @@
 package org.panteleyev.stamps.desktop.ui;
 
 import javafx.geometry.Insets;
+import org.panteleyev.fx.Controller;
 
 public final class Styles {
     public static final double BIG_SPACING = 5.0;
@@ -24,6 +25,31 @@ public final class Styles {
     public static final int TOOLTIP_STAMP_IMAGE_SIZE = 300;
     public static final int TOOLTIP_BLOCK_IMAGE_SIZE = 600;
 
+    public static final String STYLE_ABOUT_LABEL = "aboutLabel";
+
+    public static final String ABOUT_DIALOG_STYLE_SHEET = Controller.encodeStyleSheet("""
+            .gridPane {
+                -fx-hgap: 5;
+                -fx-vgap: 5;
+            }
+            
+            .dialog-pane:header .header-panel .label {
+                -fx-font-family: "Dialog";
+                -fx-font-size: 28;
+                -fx-font-weight: bold;
+            }
+            
+            .label {
+                -fx-font-family: "Dialog";
+                -fx-font-size: 14;
+            }
+            
+            .aboutLabel {
+                -fx-font-family: "Dialog";
+                -fx-font-size: 28;
+                -fx-font-weight: bold;
+            }
+            """);
 
     private Styles(){}
 }

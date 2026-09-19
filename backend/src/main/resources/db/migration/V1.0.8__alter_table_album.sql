@@ -1,0 +1,2 @@
+ALTER TABLE album
+    DROP COLUMN IF EXISTS no_tags;

@@ -8,9 +8,7 @@ import org.panteleyev.stamps.desktop.ApplicationFiles;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Base64;
-import java.util.Map;
 
-import static java.util.Map.entry;
 import static org.panteleyev.stamps.desktop.ApplicationFiles.files;
 
 public final class Settings {
@@ -20,6 +18,7 @@ public final class Settings {
     private final WindowsSettings windowsSettings = new WindowsSettings();
 
     private String mainCssEncoded = "";
+    private String dialogCssEncoded = "";
 
     public static Settings settings() {
         return SETTINGS;
@@ -31,6 +30,10 @@ public final class Settings {
 
     public String getMainCssFilePath() {
         return mainCssEncoded;
+    }
+
+    public String getDialogCssFilePath() {
+        return dialogCssEncoded;
     }
 
     public void saveStageDimensions(Controller controller) {
@@ -49,6 +52,8 @@ public final class Settings {
         try {
             var mainCssBytes = this.getClass().getResourceAsStream("/css/main.css").readAllBytes();
             mainCssEncoded = encode(mainCssBytes);
+            var dialogCssBytes = this.getClass().getResourceAsStream("/css/dialog.css").readAllBytes();
+            dialogCssEncoded = encode(dialogCssBytes);
         } catch (IOException ex) {
             throw new UncheckedIOException(ex);
         }

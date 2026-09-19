@@ -3,14 +3,14 @@
 package org.panteleyev.stamps.desktop.ui.tags;
 
 import javafx.scene.control.ListCell;
-import org.panteleyev.stamps.dto.TagDTO;
+import org.panteleyev.stamps.desktop.model.CollectionTag;
 
-class TagListCell extends ListCell<TagDTO> {
+class TagListCell extends ListCell<CollectionTag> {
     @Override
-    protected void updateItem(TagDTO item, boolean empty) {
+    protected void updateItem(CollectionTag item, boolean empty) {
         super.updateItem(item, empty);
         setText(null);
         if (item == null || empty) return;
-        setText(item.getName());
+        setText(item.name());
     }
 }

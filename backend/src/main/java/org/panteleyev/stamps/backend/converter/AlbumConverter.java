@@ -14,7 +14,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.panteleyev.stamps.backend.converter.ConverterUtils.convert;
-import static org.panteleyev.stamps.backend.converter.ConverterUtils.convertBoolean;
 
 @Component
 public class AlbumConverter {
@@ -41,7 +40,6 @@ public class AlbumConverter {
                         .findAny().orElseThrow())
                 .setStartYear(dto.getStartYear())
                 .setEndYear(dto.getEndYear())
-                .setNoTags(convertBoolean(dto.getNoTags()))
                 .setTags(tags)
                 .setExcludedTags(excludedTags);
 
@@ -63,7 +61,6 @@ public class AlbumConverter {
                 .region(entity.getRegion().getName())
                 .startYear(entity.getStartYear())
                 .endYear(entity.getEndYear())
-                .noTags(convertBoolean(entity.getNoTags()))
                 .subalbums(entity.getSubalbums().stream().map(this::entityToDTO).toList())
                 .tags(entity.getTags().stream().map(TagEntity::getName).toList())
                 .excludedTags(entity.getExcludedTags().stream().map(TagEntity::getName).toList());

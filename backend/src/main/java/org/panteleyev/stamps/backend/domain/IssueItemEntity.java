@@ -35,6 +35,7 @@ public class IssueItemEntity {
     private Boolean hasClean;
     private Boolean hasCancelled;
     private Boolean replacementRequired;
+    private Boolean noPerforation;
     private String comment;
     private IssueEntity issue;
     private Set<TagEntity> tags = new HashSet<>();
@@ -49,7 +50,7 @@ public class IssueItemEntity {
         return this;
     }
 
-    @Column(name = "issue_type", nullable = false)
+    @Column(name = "item_type", nullable = false)
     @Enumerated(EnumType.STRING)
     public IssueItemType getType() {
         return type;
@@ -159,6 +160,16 @@ public class IssueItemEntity {
         return this;
     }
 
+    @Column(nullable = false)
+    public Boolean getNoPerforation() {
+        return noPerforation;
+    }
+
+    public IssueItemEntity setNoPerforation(Boolean noPerforation) {
+        this.noPerforation = noPerforation;
+        return this;
+    }
+
     public String getComment() {
         return comment;
     }
@@ -194,6 +205,8 @@ public class IssueItemEntity {
         this.tags = tags;
         return this;
     }
+
+
 
     // Helper methods
 

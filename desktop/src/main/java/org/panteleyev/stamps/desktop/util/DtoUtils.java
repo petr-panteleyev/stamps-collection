@@ -56,6 +56,7 @@ public final class DtoUtils {
                 .hasClean(stamp.getHasClean())
                 .hasCancelled(stamp.getHasCancelled())
                 .replacementRequired(stamp.getReplacementRequired())
+                .noPerforation(stamp.getNoPerforation())
                 .blockNumber(stamp.getBlockNumber())
                 .comment(stamp.getComment())
                 .tags(new ArrayList<>(stamp.getTags()));
@@ -76,6 +77,7 @@ public final class DtoUtils {
                 .hasClean(block.getHasClean())
                 .hasCancelled(block.getHasCancelled())
                 .replacementRequired(block.getReplacementRequired())
+                .noPerforation(block.getNoPerforation())
                 .comment(block.getComment())
                 .stamps(new ArrayList<>(block.getStamps().stream().map(DtoUtils::copy).toList()))
                 .tags(new ArrayList<>(block.getTags()));
@@ -93,6 +95,7 @@ public final class DtoUtils {
                 .hasCancelled(coupling.getHasCancelled())
                 .replacementRequired(coupling.getReplacementRequired())
                 .stampNumbers(new ArrayList<>(coupling.getStampNumbers()))
+                .noPerforation(coupling.getNoPerforation())
                 .comment(coupling.getComment());
     }
 
@@ -110,6 +113,27 @@ public final class DtoUtils {
                 .stamps(new ArrayList<>(issue.getStamps().stream().map(DtoUtils::copy).toList()))
                 .blocks(new ArrayList<>(issue.getBlocks().stream().map(DtoUtils::copy).toList()))
                 .couplings(new ArrayList<>(issue.getCouplings().stream().map(DtoUtils::copy).toList()));
+    }
+
+    /// Makes a copy of [AlbumDTO].
+    ///
+    /// @param album album to copy
+    /// @return copy of the album
+    public static AlbumDTO copy(AlbumDTO album) {
+        if (album == null) return null;
+        return new AlbumDTO()
+                .id(album.getId())
+                .name(album.getName())
+                .region(album.getRegion())
+                .startYear(album.getStartYear())
+                .endYear(album.getEndYear())
+                .tags(copy(album.getTags()))
+                .excludedTags(copy(album.getExcludedTags()));
+    }
+
+    public static <T> List<T> copy(List<T> list) {
+        if (list == null) return null;
+        return new ArrayList<>(list);
     }
 
     public static String getCouplingDescription(CouplingDTO coupling) {

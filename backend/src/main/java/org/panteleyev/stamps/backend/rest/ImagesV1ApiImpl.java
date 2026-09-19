@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.stamps.backend.rest;
 
-import org.panteleyev.stamps.backend.exception.BadRequestException;
 import org.panteleyev.stamps.backend.openapi.api.ImagesV1ApiDelegate;
 import org.panteleyev.stamps.backend.service.ImageService;
 import org.panteleyev.stamps.dto.ImageUploadDTO;
@@ -20,15 +19,6 @@ public class ImagesV1ApiImpl implements ImagesV1ApiDelegate {
 
     public ImagesV1ApiImpl(ImageService service) {
         this.service = service;
-    }
-
-    @Override
-    public ResponseEntity<ImageUploadResponseDto> postImage(ImageUploadDTO dto) {
-        if (dto.getRegion() == null || dto.getNumberZag() == null) {
-            throw new BadRequestException("Region and number are mandatory");
-        }
-        var id = service.saveImage(dto);
-        return ResponseEntity.ok(new ImageUploadResponseDto().id(id));
     }
 
     @Override

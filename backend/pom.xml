@@ -17,10 +17,10 @@
     <name>Backend</name>
 
     <properties>
-        <revision>26.9.3</revision>
+        <revision>26.9.4</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>26</java.version>
-        <maven.compiler.release>26</maven.compiler.release>
+        <java.version>27</java.version>
+        <maven.compiler.release>27</maven.compiler.release>
         <!-- Plugins -->
         <buildHelperMavenPluginVersion>3.6.1</buildHelperMavenPluginVersion>
         <mavenResourcePluginVersion>3.4.0</mavenResourcePluginVersion>
@@ -29,7 +29,7 @@
         <mavenSurefirePluginVersion>3.5.4</mavenSurefirePluginVersion>
         <mavenFailSafePluginVersion>3.6.0-M1</mavenFailSafePluginVersion>
         <!--        <jpackageMavenPluginVersion>1.8.0</jpackageMavenPluginVersion>-->
-        <openapiGeneratorMavenPluginVersion>7.23.0</openapiGeneratorMavenPluginVersion>
+        <openapiGeneratorMavenPluginVersion>7.25.0</openapiGeneratorMavenPluginVersion>
         <!-- Dependencies -->
         <postgresVersion>42.7.12</postgresVersion>
         <springDocsVersion>2.8.8</springDocsVersion>
@@ -56,11 +56,11 @@
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>org.panteleyev.stamps</groupId>
-            <artifactId>stamps-dto</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.panteleyev.stamps</groupId>-->
+<!--            <artifactId>stamps-dto</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -156,7 +156,7 @@
                             <inputSpecRootDirectory>${project.basedir}/../openapi</inputSpecRootDirectory>
                             <generatorName>spring</generatorName>
                             <apiPackage>org.panteleyev.stamps.backend.openapi.api</apiPackage>
-                            <generateModels>false</generateModels>
+                            <generateModels>true</generateModels>
                             <generateModelTests>false</generateModelTests>
                             <modelPackage>org.panteleyev.stamps.dto</modelPackage>
                             <typeMappings>
@@ -181,8 +181,12 @@
                                 <useBeanValidation>false</useBeanValidation>
                                 <useResponseEntity>true</useResponseEntity>
                                 <useTags>true</useTags>
+                                <annotationLibrary>swagger2</annotationLibrary>
                                 <!--                                <useSwaggerUI>true</useSwaggerUI>-->
                             </configOptions>
+                            <openapiNormalizer>
+                                REF_AS_PARENT_IN_ALLOF=true
+                            </openapiNormalizer>
                         </configuration>
                     </execution>
                 </executions>

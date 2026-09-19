@@ -42,6 +42,7 @@ public class BlockConverter {
                 .hasCancelled(entity.getHasCancelled())
                 .replacementRequired(entity.getReplacementRequired())
                 .comment(entity.getComment())
+                .noPerforation(entity.getNoPerforation())
                 .stamps(blockStamps.stream()
                         .map(stampConverter::entityToStampDTO)
                         .sorted(STAMP_BY_NUMBER_ZAG)
@@ -55,23 +56,24 @@ public class BlockConverter {
         var entity = new IssueItemEntity();
         entity.setId(dto.getId() == null ? UUID.randomUUID() : dto.getId());
 
-        entity.setType(IssueItemType.BLOCK);
-        entity.setIssue(issue);
+        entity.setType(IssueItemType.BLOCK)
+                .setIssue(issue);
 
         var blockTags = tags.stream()
                 .filter(tag -> dto.getTags().contains(tag.getName()))
                 .collect(Collectors.toSet());
 
-        entity.setYear(issue.getYear());
-        entity.setNumberZag(dto.getNumberZag());
-        entity.setNumberCfa(dto.getNumberCfa());
-        entity.setDenomination(BigDecimal.ZERO); // Номинал блока определяется марками
-        entity.setDescription(convertString(dto.getDescription()));
-        entity.setHasClean(convertBoolean(dto.getHasClean()));
-        entity.setHasCancelled(convertBoolean(dto.getHasCancelled()));
-        entity.setReplacementRequired(convertBoolean(dto.getReplacementRequired()));
-        entity.setComment(convertString(dto.getComment()));
-        entity.setTags(blockTags);
+        entity.setYear(issue.getYear())
+                .setNumberZag(dto.getNumberZag())
+                .setNumberCfa(dto.getNumberCfa())
+                .setDenomination(BigDecimal.ZERO) // Номинал блока определяется марками
+                .setDescription(convertString(dto.getDescription()))
+                .setHasClean(convertBoolean(dto.getHasClean()))
+                .setHasCancelled(convertBoolean(dto.getHasCancelled()))
+                .setReplacementRequired(convertBoolean(dto.getReplacementRequired()))
+                .setComment(convertString(dto.getComment()))
+                .setTags(blockTags)
+                .setNoPerforation(convertBoolean(dto.getNoPerforation()));
 
         result.add(entity);
 

@@ -1,15 +1,20 @@
 openapi: "3.0.0"
 
 info:
-  title: Albums
+  title: Альбомы
   version: 1.0.0
+
+tags:
+  - name: 'albums, v1'
+    description: 'Альбомы'
 
 paths:
   /api/v1/albums:
     get:
       tags:
         - 'albums, v1'
-      summary: 'Get the list of albums'
+      summary: 'Получить список альбомов'
+      description: 'Получить полный список альбов в коллекции'
       operationId: getAlbums
       responses:
         "200":
@@ -23,7 +28,7 @@ paths:
     post:
       tags:
         - 'albums, v1'
-      summary: 'Create album'
+      summary: 'Создать альбом'
       operationId: postAlbum
       requestBody:
         required: true
@@ -44,11 +49,11 @@ paths:
     delete:
       tags:
         - 'albums, v1'
-      summary: 'Delete album'
+      summary: 'Удалить альбом'
       operationId: deleteAlbum
       parameters:
         - name: id
-          description: 'ID of the album'
+          description: 'Идентификатор альбома'
           in: path
           required: true
           schema:
@@ -61,11 +66,11 @@ paths:
     put:
       tags:
         - 'albums, v1'
-      summary: 'Upload an album'
+      summary: 'Изменить альбом'
       operationId: putAlbum
       parameters:
         - name: id
-          description: 'ID of the album'
+          description: 'Идентификатор альбома'
           in: path
           required: true
           schema:
@@ -98,36 +103,34 @@ components:
         id:
           type: string
           format: uuid
-          description: 'Primary key'
+          description: 'Идентификатор альбома'
         name:
           type: string
-          description: 'Section name'
+          description: 'Название альбома'
           nullable: false
         region:
           type: string
-          description: 'Album region'
+          description: 'Регион альбома'
           nullable: false
         startYear:
           type: integer
-          description: 'Start year of stamp issues'
+          description: 'Начальный год альбома'
         endYear:
           type: integer
-          description: 'Final year of stamp issues'
-        noTags:
-          type: boolean
-          description: 'If this album contains only items with no tags'
+          description: 'Конечный год альбома'
         tags:
           type: array
-          description: 'Album tags'
+          description: 'Теги в альбоме'
           items:
             type: string
         excludedTags:
           type: array
-          description: 'Album excluded tags'
+          description: 'Исключённые теги в альбоме'
           items:
             type: string
         subalbums:
           type: array
+          description: 'Вложенные альбомы'
           nullable: false
           items:
             $ref: '#/components/schemas/AlbumDTO'

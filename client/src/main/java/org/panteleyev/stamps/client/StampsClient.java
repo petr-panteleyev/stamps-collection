@@ -141,10 +141,6 @@ public class StampsClient {
         }
     }
 
-    public Either<ClientError, ImageUploadResponseDto> uploadImage(ImageUploadDTO dto) {
-        return call(() -> imagesV1Api.postImage(dto));
-    }
-
     public Either<ClientError, ImageUploadResponseDto> uploadImage(UUID id, ImageUploadDTO dto) {
         return call(() -> imagesV1Api.putImage(id, dto));
     }

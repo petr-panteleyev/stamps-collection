@@ -46,7 +46,7 @@ public class CollectionTableView extends TableView<CollectionItem> {
         yearColumn.setCellFactory(_ -> new ItemYearCell());
         yearColumn.widthBinding(w.multiply(0.05));
 
-        var numberZagColumn = TableFactory.<CollectionItem>tableObjectColumn("Заг.");
+        var numberZagColumn = TableFactory.<CollectionItem>tableObjectColumn("Z");
         numberZagColumn.setCellFactory(_ -> new ItemNumberZagCell());
         numberZagColumn.widthBinding(w.multiply(0.05));
 
@@ -132,5 +132,9 @@ public class CollectionTableView extends TableView<CollectionItem> {
 
     public void showReplacement() {
         tableItemPredicateProperty.set(CollectionItem::getHasCancelled);
+    }
+
+    public List<CollectionItem> getUnfilteredItems() {
+        return list;
     }
 }

@@ -3,9 +3,13 @@
 package org.panteleyev.stamps.desktop.ui.cells;
 
 import javafx.scene.control.TreeTableCell;
+import javafx.scene.image.ImageView;
+import org.panteleyev.stamps.desktop.ui.Picture;
+import org.panteleyev.stamps.desktop.util.DtoUtils;
 import org.panteleyev.stamps.dto.BlockDTO;
 import org.panteleyev.stamps.dto.CouplingDTO;
 import org.panteleyev.stamps.dto.IssueDTO;
+import org.panteleyev.stamps.dto.IssueItemDTO;
 import org.panteleyev.stamps.dto.StampDTO;
 
 import java.util.stream.Collectors;
@@ -19,6 +23,7 @@ public class ItemDescriptionCell extends TreeTableCell<Object, Object> {
     protected void updateItem(Object item, boolean empty) {
         super.updateItem(item, empty);
         setText(null);
+        setGraphic(null);
         getStyleClass().remove(CSS_ISSUE_TITLE);
 
         if (item == null || empty) return;
@@ -35,5 +40,12 @@ public class ItemDescriptionCell extends TreeTableCell<Object, Object> {
         };
 
         setText(text);
+
+        if (item instanceof IssueItemDTO issueItem && DtoUtils.normalize(issueItem.getNoPerforation())) {
+            var view = new ImageView(Picture.SQUARE.getImage());
+            view.setFitWidth(16);
+            view.setFitHeight(16);
+            setGraphic(view);
+        }
     }
 }

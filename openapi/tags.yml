@@ -1,7 +1,7 @@
 openapi: "3.0.0"
 
 info:
-  title: Tags
+  title: Теги
   version: 1.0.0
 
 paths:
@@ -9,7 +9,7 @@ paths:
     get:
       tags:
         - "tags, v1"
-      summary: 'Get the list of all tags'
+      summary: 'Получить список всех тегов'
       operationId: getTags
       responses:
         "200":
@@ -24,7 +24,7 @@ paths:
     post:
       tags:
         - "tags, v1"
-      summary: 'Create a new tag'
+      summary: 'Создать тег'
       operationId: postTag
       requestBody:
         required: true
@@ -56,11 +56,11 @@ paths:
     get:
       tags:
         - "tags, v1"
-      summary: 'Get tag by ID'
+      summary: 'Получить тег по идентификатору'
       operationId: getTagById
       parameters:
         - name: id
-          description: 'ID of the tag'
+          description: 'Идентификатор тега'
           in: path
           required: true
           schema:
@@ -83,11 +83,11 @@ paths:
     put:
       tags:
         - "tags, v1"
-      summary: 'Update existing tag'
+      summary: 'Обновить тег'
       operationId: putTag
       parameters:
         - name: id
-          description: 'ID of the tag'
+          description: 'Идентификатор тега'
           in: path
           required: true
           schema:
@@ -113,14 +113,14 @@ components:
 
     TagDTO:
       type: object
-      description: 'Tag for issues, stamps, blocks, etc.'
+      description: 'Тег для элементов коллекции'
       required:
         - name
       properties:
         id:
           type: string
           format: uuid
-          description: 'Primary key'
+          description: 'Идентификатор тега'
         name:
           type: string
-          description: 'Tag unique name'
+          description: 'Уникальное название тега'

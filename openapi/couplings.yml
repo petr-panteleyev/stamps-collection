@@ -9,11 +9,11 @@ paths:
     get:
       tags:
         - 'couplings, v1'
-      summary: 'Get the coupling'
+      summary: 'Получить данные сцепки'
       operationId: getCoupling
       parameters:
         - name: id
-          description: 'ID of the coupling'
+          description: 'Идентификатор сцепки'
           in: path
           required: true
           schema:
@@ -36,11 +36,11 @@ paths:
     patch:
       tags:
         - 'couplings, v1'
-      summary: 'Patch the coupling'
+      summary: 'Изменить данные сцепки'
       operationId: patchCoupling
       parameters:
         - name: id
-          description: 'ID of the coupling'
+          description: 'Идентификатор сцепки'
           in: path
           required: true
           schema:
@@ -70,7 +70,7 @@ components:
   schemas:
     CouplingDTO:
       type: object
-      description: 'Coupling'
+      description: 'Сцепка марок'
       required:
         - stampNumbers
       allOf:
@@ -78,6 +78,7 @@ components:
       properties:
         stampNumbers:
           type: array
-          description: 'Stamp numbers in this coupling'
+          description: 'Номера марок, входящих в сцепку, по каталогу Загорского'
+          nullable: false
           items:
             type: integer

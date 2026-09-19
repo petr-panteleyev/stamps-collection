@@ -5,10 +5,10 @@ INSERT INTO issue (id, region_id, issue_year, issue_date, title) VALUES
     (SELECT id FROM region WHERE name = 'СССР'),
     1982, '1982-11-25', 'Шедевры Государственного Эрмитажа. Итальянская живопись XV-XVI вв');
 
-INSERT INTO issue_item (id, issue_id, issue_type, issue_year, number_zag, number_cfa, denomination, description) VALUES
+INSERT INTO issue_item (id, issue_id, item_type, issue_year, number_zag, number_cfa, denomination, description) VALUES
     ('806966b9-1681-48d1-ac4b-c7478db6fb28', '89924614-c4a0-4eaf-9d4a-6be398761899', 'BLOCK', 1982, 161, 5353, 0, 'Франческо Мельци (1493-1570). "Портрет молодой женщины"');
 
-INSERT INTO issue_item (id, issue_id, issue_type, issue_year, number_zag, denomination, description) VALUES
+INSERT INTO issue_item (id, issue_id, item_type, issue_year, number_zag, denomination, description) VALUES
     ('a3c80d33-9842-4338-9afe-400190ad8068', '89924614-c4a0-4eaf-9d4a-6be398761899', 'STAMP', 1982, 5280, 0.04, '"Портрет актера"'),
     ('8ca36c77-85c8-4494-a3fd-bd7ec01567dd', '89924614-c4a0-4eaf-9d4a-6be398761899', 'STAMP', 1983, 5281, 0.10, '"Святой Себастьян"'),
     ('317d3019-a2d3-4c39-a025-cb1ce1dc99b7', '89924614-c4a0-4eaf-9d4a-6be398761899', 'STAMP', 1984, 5282, 0.20, '"Даная"'),
@@ -30,7 +30,7 @@ INSERT INTO issue (id, region_id, issue_year, issue_date, title) VALUES
     (SELECT id FROM region WHERE name = 'Россия'),
     2008, '2008-05-20', 'Выпуск-10');
 
-INSERT INTO issue_item (id, issue_id, issue_type, issue_year, number_zag, denomination, description) VALUES
+INSERT INTO issue_item (id, issue_id, item_type, issue_year, number_zag, denomination, description) VALUES
     ('86b01876-1593-44bb-8b74-c2328e604de2', 'b1883d7b-7eea-437f-8eb0-b4c71e6adffd', 'STAMP', 2008, 1232, 0.04, 'Марка 1232'),
     ('f771c03a-001b-4931-977c-cf3627f5610e', 'b1883d7b-7eea-437f-8eb0-b4c71e6adffd', 'STAMP', 2009, 1233, 0.10, 'Марка 1233'),
     ('e3641547-64c1-401e-b6ea-e20714e0a0db', 'b1883d7b-7eea-437f-8eb0-b4c71e6adffd', 'STAMP', 2010, 1234, 0.20, 'Марка 1234'),

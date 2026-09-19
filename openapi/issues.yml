@@ -1,7 +1,7 @@
 openapi: "3.0.0"
 
 info:
-  title: Issues
+  title: 'Выпуски почтовых марок'
   version: 1.0.0
 
 paths:
@@ -9,35 +9,35 @@ paths:
     get:
       tags:
         - 'issues, v1'
-      summary: 'Get the list of postage stamp issues'
+      summary: 'Получить список выпусков почтовых марок'
       operationId: getIssues
       parameters:
         - name: region
-          description: 'Region'
+          description: 'Регион'
           in: query
           required: false
           schema:
             type: string
         - name: yearStart
-          description: 'Year range start (inclusive)'
+          description: 'Первый год, включая'
           in: query
           required: false
           schema:
             type: integer
         - name: yearEnd
-          description: 'Year rage end (inclusive)'
+          description: 'Последний год, включая'
           in: query
           required: false
           schema:
             type: integer
         - name: tags
-          description: 'Comma separated list of tags'
+          description: 'Список тегов, через запятую'
           in: query
           required: false
           schema:
             type: string
         - name: excludedTags
-          description: 'Comma separated list of excluded tags'
+          description: 'Список исключённых тегов, через запятую'
           in: query
           required: false
           schema:
@@ -55,7 +55,7 @@ paths:
     post:
       tags:
         - 'issues, v1'
-      summary: 'Upload a postal stamps issue'
+      summary: 'Создать выпуск почтовых марок'
       operationId: postIssue
       requestBody:
         required: true
@@ -76,11 +76,11 @@ paths:
     delete:
       tags:
         - 'issues, v1'
-      summary: 'Delete a postal stamps issue'
+      summary: 'Удалить выпуск почтовых марок'
       operationId: deleteIssue
       parameters:
         - name: id
-          description: 'ID of the issue'
+          description: 'Идентификатор выпуска'
           in: path
           required: true
           schema:
@@ -93,11 +93,11 @@ paths:
     put:
       tags:
         - 'issues, v1'
-      summary: 'Upload a postal stamps issue'
+      summary: 'Изменить выпуск почтовых марок'
       operationId: putIssue
       parameters:
         - name: id
-          description: 'ID of the issue'
+          description: 'Идентификатор выпуска'
           in: path
           required: true
           schema:
@@ -123,7 +123,7 @@ components:
 
     IssueDTO:
       type: object
-      description: Issue of postal stamps, blocks, couplings
+      description: 'Выпуск почтовых марок'
       required:
         - title
         - region
@@ -135,26 +135,35 @@ components:
         id:
           type: string
           format: uuid
-          description: 'Primary key'
+          description: 'Идентификатор выпуска'
         region:
           type: string
-          description: 'Issue region'
+          description: 'Регион выпуска'
+          nullable: false
         date:
           type: string
           format: date
-          description: 'Issue date'
+          description: 'Дата выпуска'
+          nullable: false
         title:
           type: string
-          description: 'Issue title'
+          description: 'Название выпуска'
+          nullable: false
         stamps:
           type: array
+          description: 'Марки в выпуске'
+          nullable: false
           items:
             $ref: './stamps.yml#/components/schemas/StampDTO'
         blocks:
           type: array
+          description: 'Блоки в выпуске'
+          nullable: false
           items:
             $ref: './blocks.yml#/components/schemas/BlockDTO'
         couplings:
           type: array
+          description: 'Сцепки в выпуске'
+          nullable: false
           items:
             $ref: './couplings.yml#/components/schemas/CouplingDTO'

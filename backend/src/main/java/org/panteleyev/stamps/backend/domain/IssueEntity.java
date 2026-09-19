@@ -62,7 +62,7 @@ public class IssueEntity {
         return this;
     }
 
-    @Column(name = "issue_date")
+    @Column(name = "issue_date", nullable = false)
     public LocalDate getDate() {
         return date;
     }

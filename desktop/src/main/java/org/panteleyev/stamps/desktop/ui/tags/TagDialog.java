@@ -4,23 +4,28 @@ package org.panteleyev.stamps.desktop.ui.tags;
 
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
+import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
-import org.panteleyev.stamps.dto.TagDTO;
+import org.panteleyev.stamps.desktop.model.CollectionTag;
 
 import java.util.List;
 
+import static javafx.application.Platform.runLater;
 import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
 import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.stamps.desktop.ui.MainWindowController.UI;
+import static org.panteleyev.stamps.desktop.ui.Validators.STRING_NOT_EMPTY_VALIDATOR;
 
-public class TagDialog extends BaseDialog<TagDTO> {
+public class TagDialog extends BaseDialog<CollectionTag> {
     private final TextField nameEdit = new TextField();
 
-    public TagDialog(TagDTO tag) {
+    private final ValidationSupport validation = new ValidationSupport();
+
+    public TagDialog(CollectionTag tag) {
         setTitle("Тег");
 
-        nameEdit.setText(tag.getName());
+        nameEdit.setText(tag.name());
 
         var grid = gridPane(List.of(
                 gridRow(label("Название:"), nameEdit)
@@ -30,7 +35,17 @@ public class TagDialog extends BaseDialog<TagDTO> {
 
         setResultConverter(buttonType -> {
             if (buttonType != ButtonType.OK) return null;
-            return tag.name(nameEdit.getText());
+            return new CollectionTag(tag.id(), nameEdit.getText());
         });
+
+        runLater(() -> {
+            createValidationSupport();
+            nameEdit.requestFocus();
+        });
+    }
+
+    private void createValidationSupport() {
+        validation.registerValidator(nameEdit, STRING_NOT_EMPTY_VALIDATOR);
+        validation.initInitialDecoration();
     }
 }

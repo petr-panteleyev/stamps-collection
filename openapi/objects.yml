@@ -11,31 +11,36 @@ components:
   schemas:
     IssueItemDTO:
       type: object
-      description: 'Base fields for stamps, couplings and blocks'
+      description: 'Базовые поля для марок, блоков и сцепок'
       reqiured:
         - hasClean
         - hasCancelled
         - replacementRequired
+        - noPerforation
       properties:
         id:
           type: string
           format: uuid
-          description: 'Primary key'
+          description: 'Идентификатор элемента'
         hasClean:
           type: boolean
-          description: 'Clean item is present in the collection'
+          description: 'Коллекция содержит чистую марку, блок, сцепку'
           nullable: false
         hasCancelled:
           type: boolean
-          description: 'Cancelled item is present in the collection'
+          description: 'Коллекция содержит гашёную марку, блок, сцепку'
           nullable: false
         replacementRequired:
           type: boolean
-          description: 'Replacement required: damaged, etc.'
+          description: 'Элемент нуждается в замене (например, поврежден)'
+          nullable: false
+        noPerforation:
+          type: boolean
+          description: 'Марка, блок или сцепка без перфорации'
           nullable: false
         comment:
           type: string
-          description: 'Comment'
+          description: 'Комментарий'
 
     ItemPatchDTO:
       type: object
@@ -43,17 +48,17 @@ components:
       properties:
         hasClean:
           type: boolean
-          description: 'Clean item is present in the collection'
+          description: 'Коллекция содержит чистую марку, блок, сцепку'
         hasCancelled:
           type: boolean
-          description: 'Cancelled item is present in the collection'
+          description: 'Коллекция содержит гашёную марку, блок, сцепку'
         replacementRequired:
           type: boolean
-          description: 'Replacement required: damaged, etc.'
+          description: 'Элемент нуждается в замене (например, поврежден'
 
     ErrorDTO:
       type: object
-      description: 'Error message'
+      description: 'Сообщение об ошибке'
       required:
         - code
         - error
@@ -62,18 +67,18 @@ components:
       properties:
         code:
           type: integer
-          description: 'Error code'
+          description: 'Код ошибки'
           nullable: false
         error:
           type: string
-          description: 'Error message'
+          description: 'Сообщение'
           nullable: false
         path:
           type: string
-          description: 'Request path'
+          description: 'Путь запроса'
           nullable: false
         timestamp:
           type: string
           format: date-time
-          description: 'Timestamp of the response'
+          description: 'Время ответа'
           nullable: false

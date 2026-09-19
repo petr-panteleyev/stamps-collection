@@ -33,7 +33,7 @@
                             <icon>../icons/icons.ico</icon>
                             <winMenu>true</winMenu>
                             <winDirChooser>true</winDirChooser>
-                            <winUpgradeUuid>38dac4b6-91d2-4ca8-aacb-2e0cfd54127a</winUpgradeUuid>
+                            <winUpgradeUuid>6f64762a-9245-42b6-b308-ce9bbb3aaabc</winUpgradeUuid>
                             <winMenuGroup>panteleyev.org</winMenuGroup>
                         </configuration>
                     </plugin>
@@ -230,7 +230,6 @@
                     <removeDestination>true</removeDestination>
                     <javaOptions>
                         <option>-XX:NewRatio=1</option>
-                        <option>-XX:+UseCompactObjectHeaders</option>
                         <option>--enable-native-access=javafx.graphics</option>
                         <option>--sun-misc-unsafe-memory-access=allow</option>
                         <option>--add-exports</option>
@@ -253,7 +252,6 @@
                             <longModulepath>false</longModulepath>
                             <arguments>
                                 <argument>-XX:NewRatio=1</argument>
-                                <argument>-XX:+UseCompactObjectHeaders</argument>
                                 <argument>--enable-native-access=javafx.graphics</argument>
                                 <argument>--sun-misc-unsafe-memory-access=allow</argument>
                                 <argument>--add-exports</argument>

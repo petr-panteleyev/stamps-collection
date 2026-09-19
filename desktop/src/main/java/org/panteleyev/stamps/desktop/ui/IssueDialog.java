@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.stamps.desktop.ui;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
@@ -78,6 +79,8 @@ public class IssueDialog extends BaseDialog<IssueDTO> {
             return issue.title(issueTitleField.getText())
                     .date(issueDatePicker.getValue());
         });
+
+        Platform.runLater(issueDatePicker::requestFocus);
     }
 
     private void setData(IssueDTO issue) {

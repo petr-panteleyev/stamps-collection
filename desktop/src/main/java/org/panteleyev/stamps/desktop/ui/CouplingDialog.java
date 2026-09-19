@@ -16,6 +16,8 @@ import static org.panteleyev.fx.factories.StringFactory.string;
 import static org.panteleyev.fx.factories.grid.GridCell.gridCell;
 import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
 import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
+import static org.panteleyev.stamps.desktop.settings.Settings.settings;
+import static org.panteleyev.stamps.desktop.ui.Styles.GRID_PANE;
 
 public class CouplingDialog extends BaseDialog<CouplingDTO> {
     private final CouplingDTO coupling;
@@ -26,6 +28,8 @@ public class CouplingDialog extends BaseDialog<CouplingDTO> {
     private final TextField commentEdit = new TextField();
 
     public CouplingDialog(CouplingDTO coupling) {
+        super(settings().getDialogCssFilePath());
+
         this.coupling = coupling;
 
         setTitle("Блок");
@@ -35,7 +39,7 @@ public class CouplingDialog extends BaseDialog<CouplingDTO> {
                 gridRow(gridCell(hasCancelledCheckBox, 2, 1)),
                 gridRow(gridCell(replacementCheckBox, 2, 1)),
                 gridRow(label(string("Комментарий", COLON)), commentEdit)
-        ));
+        ), List.of(), List.of(GRID_PANE));
         getDialogPane().setContent(root);
 
         createDefaultButtons(null);

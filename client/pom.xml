@@ -16,11 +16,11 @@
     <name>Client Library</name>
 
     <dependencies>
-        <dependency>
-            <groupId>org.panteleyev.stamps</groupId>
-            <artifactId>stamps-dto</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.panteleyev.stamps</groupId>-->
+<!--            <artifactId>stamps-dto</artifactId>-->
+<!--            <version>${project.version}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -61,7 +61,7 @@
                             <inputSpecRootDirectory>${project.basedir}/../openapi</inputSpecRootDirectory>
                             <generatorName>java</generatorName>
 
-                            <generateModels>false</generateModels>
+                            <generateModels>true</generateModels>
                             <generateModelTests>false</generateModelTests>
                             <modelPackage>org.panteleyev.stamps.dto</modelPackage>
 
@@ -108,6 +108,10 @@
                                 <serializationLibrary>jackson</serializationLibrary>
                                 <useJspecify>true</useJspecify>
                             </configOptions>
+
+                            <openapiNormalizer>
+                                REF_AS_PARENT_IN_ALLOF=true
+                            </openapiNormalizer>
                         </configuration>
                     </execution>
                 </executions>

@@ -1,6 +1,7 @@
 // Copyright © 2026 Petr Panteleyev
 // SPDX-License-Identifier: BSD-2-Clause
 module stamps.client {
+    exports org.panteleyev.stamps.dto;
     exports org.panteleyev.stamps.client;
 
     requires java.net.http;
@@ -14,5 +15,5 @@ module stamps.client {
     requires org.jspecify;
 
     requires transitive org.panteleyev.functional;
-    requires org.panteleyev.stamps.dto;
+//    requires org.panteleyev.stamps.dto;
 }

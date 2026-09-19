@@ -1,38 +1,19 @@
 openapi: "3.0.0"
 
 info:
-  title: Images
+  title: 'Изображения для марок, блоков и сцепок'
   version: 1.0.0
 
 paths:
-  /api/v1/images:
-    post:
-      tags:
-        - 'images, v1'
-      summary: 'Upload an image'
-      operationId: postImage
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ImageUploadDTO'
-      responses:
-        "200":
-          description: 'Success'
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ImageUploadResponseDto'
-
   /api/v1/images/{id}:
     put:
       tags:
         - "images, v1"
-      summary: 'Put image'
+      summary: 'Обновить изображение'
       operationId: putImage
       parameters:
         - name: id
+          description: 'Идентификатор изображения'
           in: path
           required: true
           schema:
@@ -56,10 +37,11 @@ paths:
     get:
       tags:
         - "images, v1"
-      summary: 'Get image bytes'
+      summary: 'Получить байты изображения'
       operationId: getImageBytes
       parameters:
         - name: id
+          description: 'Идентификатор изображения'
           in: path
           required: true
           schema:
@@ -67,7 +49,7 @@ paths:
             format: uuid
       responses:
         '200':
-          description: 'Image response'
+          description: 'Success'
           content:
             image/png:
               schema:
@@ -83,31 +65,22 @@ components:
 
     ImageUploadDTO:
       type: object
-      description: 'Image for stamps, blocks and couplings'
+      description: 'Запрос на обновление изображения'
       required:
         - image
       properties:
-        region:
-          type: string
-          description: 'Region of stamp issue'
-        numberZag:
-          type: integer
-          description: 'Number from catalogue by V. Zagorsky'
-        isBlock:
-          type: boolean
-          description: 'If this image is for block'
         image:
           type: string
-          description: 'Image bytes encoded in Base64'
+          description: 'Байты изображения в Base64'
           nullable: false
 
     ImageUploadResponseDto:
       type: object
-      description: 'Response for image upload request'
+      description: 'Ответ на запрос на обновление изображения'
       required:
         - id
       properties:
         id:
           type: string
           format: uuid
-          description: 'ID of uploaded image (new or existing)'
+          description: 'Идентификатор изображения'

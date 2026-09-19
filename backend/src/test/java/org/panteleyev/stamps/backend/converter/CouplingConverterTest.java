@@ -49,6 +49,7 @@ public class CouplingConverterTest {
                                 .setHasCancelled(false)
                                 .setHasClean(false)
                                 .setReplacementRequired(false)
+                                .setNoPerforation(false)
                                 .setCouplingItems("1000,1001,1002")
                 ),
                 argumentSet("Full set, tags",
@@ -58,6 +59,7 @@ public class CouplingConverterTest {
                                 .hasCancelled(true)
                                 .hasClean(true)
                                 .replacementRequired(true)
+                                .noPerforation(true)
                                 .stampNumbers(List.of(1000, 1001, 1002)),
                         new IssueEntity().setId(ISSUE_ENTITY_ID),
                         List.of(new IssueItemEntity().setNumberZag(1000).setTags(Set.of(TAG_1, TAG_2)),
@@ -72,6 +74,7 @@ public class CouplingConverterTest {
                                 .setHasCancelled(true)
                                 .setHasClean(true)
                                 .setReplacementRequired(true)
+                                .setNoPerforation(true)
                                 .setCouplingItems("1000,1001,1002")
                                 .setTags(Set.of(TAG_1, TAG_2, TAG_3))
                 )
@@ -97,6 +100,8 @@ public class CouplingConverterTest {
         assertThat(actual.getHasClean()).isEqualTo(expected.getHasClean());
         assertThat(actual.getHasCancelled()).isEqualTo(expected.getHasCancelled());
         assertThat(actual.getReplacementRequired()).isEqualTo(expected.getReplacementRequired());
+
+        assertThat(actual.getNoPerforation()).isEqualTo(expected.getNoPerforation());
 
         assertThat(actual.getBlockNumber()).isNull();
         assertThat(actual.getDescription()).isEmpty();

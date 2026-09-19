@@ -57,6 +57,7 @@ public class DtoUtilsTest extends BaseUnitTest {
                 .hasClean(randomBoolean())
                 .hasCancelled(randomBoolean())
                 .replacementRequired(randomBoolean())
+                .noPerforation(randomBoolean())
                 .description(randomString())
                 .comment(randomString())
                 .denomination(randomDecimal())
@@ -78,6 +79,7 @@ public class DtoUtilsTest extends BaseUnitTest {
                 .hasCancelled(randomBoolean())
                 .replacementRequired(randomBoolean())
                 .comment(randomString())
+                .noPerforation(randomBoolean())
                 .stampNumbers(List.of(randomInt(), randomInt(), randomInt()));
 
         var actual = DtoUtils.copy(given);

@@ -15,16 +15,16 @@ import java.util.UUID;
 public class RegionEntity {
     private UUID id;
     private String name;
-    private Integer yearStart;
-    private Integer yearEnd;
+    private Integer startYear;
+    private Integer endYear;
 
     public RegionEntity() {
     }
 
-    public RegionEntity(String name, Integer yearStart, Integer yearEnd) {
+    public RegionEntity(String name, Integer startYear, Integer endYear) {
         this.name = name;
-        this.yearStart = yearStart;
-        this.yearEnd = yearEnd;
+        this.startYear = startYear;
+        this.endYear = endYear;
     }
 
     @Id
@@ -49,21 +49,21 @@ public class RegionEntity {
     }
 
     @Column(nullable = false)
-    public Integer getYearStart() {
-        return yearStart;
+    public Integer getStartYear() {
+        return startYear;
     }
 
-    public RegionEntity setYearStart(Integer yearStart) {
-        this.yearStart = yearStart;
+    public RegionEntity setStartYear(Integer startYear) {
+        this.startYear = startYear;
         return this;
     }
 
-    public Integer getYearEnd() {
-        return yearEnd;
+    public Integer getEndYear() {
+        return endYear;
     }
 
-    public RegionEntity setYearEnd(Integer yearEnd) {
-        this.yearEnd = yearEnd;
+    public RegionEntity setEndYear(Integer endYear) {
+        this.endYear = endYear;
         return this;
     }
 
@@ -72,12 +72,12 @@ public class RegionEntity {
         if (!(o instanceof RegionEntity that)) return false;
         return Objects.equals(id, that.id)
                 && Objects.equals(name, that.name)
-                && Objects.equals(yearStart, that.yearStart)
-                && Objects.equals(yearEnd, that.yearEnd);
+                && Objects.equals(startYear, that.startYear)
+                && Objects.equals(endYear, that.endYear);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, yearStart, yearEnd);
+        return Objects.hash(id, name, startYear, endYear);
     }
 }

@@ -6,7 +6,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
@@ -26,6 +25,7 @@ import org.panteleyev.stamps.desktop.model.CollectionItem;
 import org.panteleyev.stamps.desktop.profiles.ConnectDialog;
 import org.panteleyev.stamps.desktop.profiles.ConnectionProfile;
 import org.panteleyev.stamps.desktop.profiles.ConnectionProfileManager;
+import org.panteleyev.stamps.desktop.ui.albums.AlbumDialog;
 import org.panteleyev.stamps.desktop.ui.albums.AlbumsEditor;
 import org.panteleyev.stamps.desktop.ui.tags.TagsEditor;
 import org.panteleyev.stamps.dto.AlbumDTO;
@@ -60,13 +60,13 @@ import static org.panteleyev.stamps.desktop.GlobalContext.stampsService;
 import static org.panteleyev.stamps.desktop.settings.Settings.settings;
 import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_ALT_B;
 import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_ALT_C;
+import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_ALT_F;
 import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_ALT_I;
 import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.stamps.desktop.ui.Styles.TOOLTIP_BLOCK_IMAGE_SIZE;
 import static org.panteleyev.stamps.desktop.ui.Styles.TOOLTIP_STAMP_IMAGE_SIZE;
 import static org.panteleyev.stamps.desktop.util.DtoUtils.ALBUM_COMPARATOR_BY_NAME;
-import static org.panteleyev.stamps.desktop.util.DtoUtils.ISSUE_COMPARATOR_BY_DATE;
 import static org.panteleyev.stamps.desktop.util.DtoUtils.copy;
 
 public class MainWindowController extends BaseController {
@@ -78,6 +78,8 @@ public class MainWindowController extends BaseController {
             };
         }
     };
+
+    public static final String APP_TITLE = "Коллекция марок";
 
     private static final FileChooser.ExtensionFilter IMAGE_EXTENSION_FILTER =
             new FileChooser.ExtensionFilter("Изображения", List.of("*.png", "*.jpg", "*.jpeg"));
@@ -98,6 +100,7 @@ public class MainWindowController extends BaseController {
     private final BooleanProperty uploadImageEnabled = new SimpleBooleanProperty(false);
     private final BooleanProperty tagsEditorEnabled = new SimpleBooleanProperty(false);
     private final BooleanProperty editAlbumsEnabled = new SimpleBooleanProperty(false);
+    private final BooleanProperty filterEnabled = new SimpleBooleanProperty(false);
 
     // Actions
     private final FxAction newIssueAction = fxAction("Новый выпуск...")
@@ -110,6 +113,8 @@ public class MainWindowController extends BaseController {
             .onAction(this::onUploadImage).accelerator(SHORTCUT_ALT_I).disableBinding(uploadImageEnabled.not());
     private final FxAction editTagsAction = fxAction("Теги")
             .onAction(this::onEditTags).disableBinding(tagsEditorEnabled.not());
+    private final FxAction filterAction = fxAction("Фильтр...")
+            .onAction(this::onFilter).accelerator(SHORTCUT_ALT_F).disableBinding(filterEnabled.not());
 
     private final AtomicReference<String> imageDirectory = new AtomicReference<>(null);
 
@@ -119,6 +124,7 @@ public class MainWindowController extends BaseController {
 
     public MainWindowController(Stage stage) {
         super(stage, settings().getMainCssFilePath());
+        getStage().getIcons().add(Picture.STAMP.getImage());
 
         profileManager.loadProfiles();
 
@@ -138,7 +144,7 @@ public class MainWindowController extends BaseController {
 
     @Override
     public String getTitle() {
-        var title = "Коллекция марок";
+        var title = APP_TITLE;
         if (currentAlbum != null) {
             title += " - " + currentAlbum.getName();
         }
@@ -167,7 +173,9 @@ public class MainWindowController extends BaseController {
                 new SeparatorMenuItem(),
                 uploadImageAction.createMenuItem(),
                 new SeparatorMenuItem(),
-                editTagsAction.createMenuItem()
+                editTagsAction.createMenuItem(),
+                new SeparatorMenuItem(),
+                filterAction.createMenuItem()
         );
 
         var editAlbumsMenuItem = menuItem("Редактировать альбомы", this::onEditAlbums);
@@ -178,7 +186,9 @@ public class MainWindowController extends BaseController {
         var profilesMenuItem = menuItem("Профили", this::onProfiles);
         var serviceMenu = menu("Сервис", profilesMenuItem);
 
-        return menuBar(fileMenu, editMenu, albumMenu, serviceMenu);
+        return menuBar(fileMenu, editMenu, albumMenu, serviceMenu,
+                menu("Справка", menuItem("О приложении...", this::onAbout))
+        );
     }
 
     private ContextMenu createContextMenu() {
@@ -221,7 +231,7 @@ public class MainWindowController extends BaseController {
         return menuItem(album.getName(), _ -> onAlbum(album));
     }
 
-    private Node createToolBar() {
+    private ToolBar createToolBar() {
         var group = new ToggleGroup();
         showAllRadio.setToggleGroup(group);
         showPresentRadio.setToggleGroup(group);
@@ -234,6 +244,10 @@ public class MainWindowController extends BaseController {
         showMissingRadio.setOnAction(_ -> view.showMissing());
         showReplacementRadio.setOnAction(_ -> view.showReplacement());
 
+        showPresentRadio.managedProperty().bind(showPresentRadio.visibleProperty());
+        showMissingRadio.managedProperty().bind(showMissingRadio.visibleProperty());
+        showReplacementRadio.managedProperty().bind(showReplacementRadio.visibleProperty());
+
         return new ToolBar(showPresentRadio, showMissingRadio, showReplacementRadio, showAllRadio);
     }
 
@@ -242,8 +256,14 @@ public class MainWindowController extends BaseController {
         getStage().setTitle(getTitle());
         loadData();
         onSelectedRow(null);
-        showPresentRadio.fire();
-        view.showPresent();
+        setButtonsVisibility();
+        if (showPresentRadio.isVisible()) {
+            showPresentRadio.fire();
+            view.showPresent();
+        } else {
+            showAllRadio.fire();
+            view.showAll();
+        }
     }
 
     private void loadData() {
@@ -319,7 +339,14 @@ public class MainWindowController extends BaseController {
     }
 
     private void onEditTags(ActionEvent ignored) {
-        new TagsEditor().showAndWait();
+        new TagsEditor().showAndWait().ifPresent(result -> {
+            for (var update : result.toUpdate()) {
+                stampsService().updateTag(update);
+            }
+            for (var create : result.toAdd()) {
+                stampsService().createTag(create);
+            }
+        });
     }
 
     private void onEditAlbums(ActionEvent ignored) {
@@ -337,6 +364,11 @@ public class MainWindowController extends BaseController {
     private Optional<IssueDTO> getParentIssueDTO(CollectionItem collectionItem) {
         if (collectionItem == null) return Optional.empty();
         return Optional.of(collectionItem.getParent());
+    }
+
+    private void onFilter(ActionEvent ignored) {
+        var filter = currentAlbum == null ? new AlbumDTO() : copy(currentAlbum);
+        new AlbumDialog(filter, true).showAndWait().ifPresent(this::onAlbum);
     }
 
     private void onProfiles(ActionEvent ignored) {
@@ -361,6 +393,7 @@ public class MainWindowController extends BaseController {
     private void onSelectedRow(CollectionItem selected) {
         tagsEditorEnabled.set(stampsService().connectedProperty().get());
         editAlbumsEnabled.set(stampsService().connectedProperty().get());
+        filterEnabled.set(stampsService().connectedProperty().get());
 
         if (!stampsService().connectedProperty().get() || currentAlbum == null) {
             newIssueEnabled.set(false);
@@ -375,5 +408,23 @@ public class MainWindowController extends BaseController {
                     selected != null && !selected.isIssue()
             );
         }
+    }
+
+    private void onAbout(ActionEvent ignored) {
+        new AboutDialog(this).showAndWait();
+    }
+
+    private void setButtonsVisibility() {
+        var showPresentButton = view.getUnfilteredItems().stream()
+                .anyMatch(i -> i.getHasClean() || i.getHasCancelled());
+        showPresentRadio.setVisible(showPresentButton);
+
+        var showReplaceButton = view.getUnfilteredItems().stream()
+                .anyMatch(i -> i.getHasCancelled() || i.getReplacementRequired());
+        showReplacementRadio.setVisible(showReplaceButton);
+
+        var showMissingButton = view.getUnfilteredItems().stream()
+                .anyMatch(i -> !i.getHasClean() && !i.getHasCancelled());
+        showMissingRadio.setVisible(showMissingButton);
     }
 }

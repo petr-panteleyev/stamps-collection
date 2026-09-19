@@ -3,7 +3,6 @@
 package org.panteleyev.stamps.desktop.ui.albums;
 
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
@@ -15,28 +14,39 @@ import java.util.List;
 
 import static javafx.application.Platform.runLater;
 import static org.panteleyev.fx.factories.LabelFactory.label;
-import static org.panteleyev.fx.factories.grid.GridCell.gridCell;
 import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
 import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
 import static org.panteleyev.stamps.desktop.GlobalContext.stampsService;
+import static org.panteleyev.stamps.desktop.settings.Settings.settings;
 import static org.panteleyev.stamps.desktop.ui.MainWindowController.UI;
+import static org.panteleyev.stamps.desktop.ui.Styles.GRID_PANE;
 import static org.panteleyev.stamps.desktop.ui.Validators.INTEGER_OR_NULL_VALIDATOR;
 import static org.panteleyev.stamps.desktop.ui.Validators.STRING_NOT_EMPTY_VALIDATOR;
 import static org.panteleyev.stamps.desktop.util.DtoUtils.normalize;
 
-class AlbumDialog extends BaseDialog<AlbumDTO> {
+public class AlbumDialog extends BaseDialog<AlbumDTO> {
+    private static final int NAME_LABEL_INDEX = 2;
+
     private final RegionChoiceBox regionChoiceBox = new RegionChoiceBox();
     private final TextField nameEdit = new TextField();
     private final TextField startYearEdit = new TextField();
     private final TextField endYearEdit = new TextField();
-    private final CheckBox noTagsCheckBox = new CheckBox("Без тегов");
     private final TagComboBox tagsComboBox = new TagComboBox();
     private final TagComboBox excludedTagsComboBox = new TagComboBox();
 
     private final ValidationSupport validation = new ValidationSupport();
 
     public AlbumDialog(AlbumDTO album) {
-        setTitle(album.getName());
+        this(album, false);
+    }
+
+    public AlbumDialog(AlbumDTO album, boolean filter) {
+        super(settings().getDialogCssFilePath());
+
+        if (filter) {
+            setTitle("Фильтр");
+            nameEdit.setDisable(true);
+        }
 
         regionChoiceBox.setRegions(stampsService().loadRegions());
 
@@ -46,19 +56,19 @@ class AlbumDialog extends BaseDialog<AlbumDTO> {
 
         nameEdit.setPrefColumnCount(20);
 
-        noTagsCheckBox.setOnAction(_ -> {
-            tagsComboBox.setDisable(noTagsCheckBox.isSelected());
-            excludedTagsComboBox.setDisable(noTagsCheckBox.isSelected());
-        });
-
         var grid = gridPane(List.of(
-                gridRow(regionChoiceBox, nameEdit),
+                gridRow(label("Регион:"), regionChoiceBox),
+                gridRow(label("Название:"), nameEdit),
                 gridRow(label("Начало:"), startYearEdit),
                 gridRow(label("Конец:"), endYearEdit),
-                gridRow(gridCell(noTagsCheckBox, 2, 1)),
                 gridRow(label("Теги:"), tagsComboBox),
                 gridRow(label("Искл. теги:"), excludedTagsComboBox)
-        ));
+        ), List.of(), List.of(GRID_PANE));
+
+        if (filter) {
+            // If this is a filter dialog name is not required
+            grid.getChildren().remove(NAME_LABEL_INDEX, NAME_LABEL_INDEX + 2);
+        }
 
         nameEdit.setText(album.getName());
         if (album.getRegion() == null) {
@@ -68,7 +78,6 @@ class AlbumDialog extends BaseDialog<AlbumDTO> {
         }
         startYearEdit.setText(toString(album.getStartYear()));
         endYearEdit.setText(toString(album.getEndYear()));
-        noTagsCheckBox.setSelected(normalize(album.getNoTags()));
         normalize(album.getTags()).forEach(t -> tagsComboBox.getCheckModel().check(t));
         normalize(album.getExcludedTags()).forEach(t -> excludedTagsComboBox.getCheckModel().check(t));
 
@@ -84,17 +93,11 @@ class AlbumDialog extends BaseDialog<AlbumDTO> {
 
             album.name(nameEdit.getText())
                     .region(regionChoiceBox.getSelectionModel().getSelectedItem())
-                    .noTags(noTagsCheckBox.isSelected())
                     .startYear(startYear)
                     .endYear(endYear);
 
-            if (noTagsCheckBox.isSelected()) {
-                album.tags(List.of())
-                        .excludedTags(null);
-            } else {
-                album.tags(tagsComboBox.getCheckModel().getCheckedItems())
-                        .excludedTags(excludedTagsComboBox.getCheckModel().getCheckedItems());
-            }
+            album.tags(tagsComboBox.getCheckModel().getCheckedItems())
+                    .excludedTags(excludedTagsComboBox.getCheckModel().getCheckedItems());
 
             return album;
         });

@@ -69,9 +69,9 @@ public class IssueItemRepositoryIT extends BaseSpringBootTest {
                         null, null, null, null, Set.of("Космос"),
                         List.of(5281, 5283, 1233, 1234, 161)
                 ),
-                argumentSet("No tags",
+                argumentSet("Empty tags shoudl give all",
                         null, null, null, Set.of(), null,
-                        List.of(161)
+                        List.of(5280, 5281, 5282, 5283, 5284, 1232, 1233, 1234, 1235, 1236, 161)
                 )
         );
     }

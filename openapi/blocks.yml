@@ -9,11 +9,11 @@ paths:
     get:
       tags:
         - 'blocks, v1'
-      summary: 'Get the block'
+      summary: 'Получить данные почтового блока'
       operationId: getBlock
       parameters:
         - name: id
-          description: 'ID of the block'
+          description: 'Идентификатор блока'
           in: path
           required: true
           schema:
@@ -36,11 +36,11 @@ paths:
     patch:
       tags:
         - 'blocks, v1'
-      summary: 'Patch the block'
+      summary: 'Изменить данные почтового блока'
       operationId: patchBlock
       parameters:
         - name: id
-          description: 'ID of the block'
+          description: 'Идентификатор блока'
           in: path
           required: true
           schema:
@@ -71,7 +71,7 @@ components:
 
     BlockDTO:
       type: object
-      description: 'Postal block'
+      description: 'Почтовый блок'
       required:
         - numberZag
         - description
@@ -82,23 +82,24 @@ components:
       properties:
         year:
           type: integer
-          description: 'Year of the block issue'
+          description: 'Год выпуска почтового блока'
         numberZag:
           type: integer
-          description: 'Number from catalogue by V. Zagorsky'
+          description: 'Номер по каталогу Загорского'
+          nullable: false
         numberCfa:
           type: integer
-          description: 'Number from USSR official catalogue'
+          description: 'Номер по каталогу ЦФА (для СССР)'
         description:
           type: string
-          description: 'Block description'
+          description: 'Описание почтового блока'
         stamps:
           type: array
-          description: 'Stamps in this block'
+          description: 'Марки в почтовом блоке'
           items:
             $ref: './stamps.yml#/components/schemas/StampDTO'
         tags:
           type: array
-          description: 'Block tags'
+          description: 'Теги почтового блока'
           items:
             type: string

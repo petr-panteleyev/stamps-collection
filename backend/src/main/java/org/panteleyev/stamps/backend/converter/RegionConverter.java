@@ -12,15 +12,15 @@ public class RegionConverter {
         return new RegionEntity()
                 .setId(dto.getId())
                 .setName(dto.getName())
-                .setYearStart(dto.getYearStart())
-                .setYearEnd(dto.getYearEnd());
+                .setStartYear(dto.getStartYear())
+                .setEndYear(dto.getEndYear());
     }
 
     public RegionDTO entityToRegionDTO(RegionEntity entity) {
         return new RegionDTO()
                 .id(entity.getId())
                 .name(entity.getName())
-                .yearStart(entity.getYearStart())
-                .yearEnd(entity.getYearEnd());
+                .startYear(entity.getStartYear())
+                .endYear(entity.getEndYear());
     }
 }

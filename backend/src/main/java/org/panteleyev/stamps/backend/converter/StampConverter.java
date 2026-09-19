@@ -23,22 +23,23 @@ public class StampConverter {
         var entity = new IssueItemEntity();
         entity.setId(dto.getId() == null ? UUID.randomUUID() : dto.getId());
 
-        entity.setType(IssueItemType.STAMP);
-        entity.setIssue(issue);
-        entity.setYear(issue.getYear());
-        entity.setNumberZag(dto.getNumberZag());
-        entity.setNumberCfa(dto.getNumberCfa());
-        entity.setDenomination(dto.getDenomination());
-        entity.setDescription(convertString(dto.getDescription()));
-        entity.setBlockNumber(null);
-        entity.setCouplingItems(null);
-        entity.setHasClean(convertBoolean(dto.getHasClean()));
-        entity.setHasCancelled(convertBoolean(dto.getHasCancelled()));
-        entity.setReplacementRequired(convertBoolean(dto.getReplacementRequired()));
-        entity.setComment(convertString(dto.getComment()));
-        entity.setTags(tags.stream().filter(
-                tag -> dto.getTags().contains(tag.getName())
-        ).collect(Collectors.toSet()));
+        entity.setType(IssueItemType.STAMP)
+                .setIssue(issue)
+                .setYear(issue.getYear())
+                .setNumberZag(dto.getNumberZag())
+                .setNumberCfa(dto.getNumberCfa())
+                .setDenomination(dto.getDenomination())
+                .setDescription(convertString(dto.getDescription()))
+                .setBlockNumber(null)
+                .setCouplingItems(null)
+                .setHasClean(convertBoolean(dto.getHasClean()))
+                .setHasCancelled(convertBoolean(dto.getHasCancelled()))
+                .setReplacementRequired(convertBoolean(dto.getReplacementRequired()))
+                .setNoPerforation(convertBoolean(dto.getNoPerforation()))
+                .setComment(convertString(dto.getComment()))
+                .setTags(tags.stream().filter(
+                        tag -> dto.getTags().contains(tag.getName())
+                ).collect(Collectors.toSet()));
 
         return entity;
     }
@@ -60,6 +61,7 @@ public class StampConverter {
                 .hasClean(entity.getHasClean())
                 .hasCancelled(entity.getHasCancelled())
                 .replacementRequired(entity.getReplacementRequired())
+                .noPerforation(entity.getNoPerforation())
                 .comment(entity.getComment())
                 .blockNumber(entity.getBlockNumber())
                 .tags(tags);

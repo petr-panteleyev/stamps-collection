@@ -44,6 +44,7 @@ public class BlockConverterTest {
                                 .replacementRequired(true)
                                 .numberZag(1000)
                                 .numberCfa(2000)
+                                .noPerforation(true)
                                 .stamps(List.of(
                                         new StampDTO()
                                                 .id(randomId())
@@ -71,6 +72,7 @@ public class BlockConverterTest {
                                         .setHasCancelled(true)
                                         .setHasClean(true)
                                         .setReplacementRequired(true)
+                                        .setNoPerforation(true)
                                         .setTags(Set.of(TAG_1, TAG_3)),
                                 new IssueItemEntity()
                                         .setType(IssueItemType.STAMP)
@@ -119,6 +121,8 @@ public class BlockConverterTest {
         assertThat(blockEntity.getHasClean()).isEqualTo(expectedBlockEntity.getHasClean());
         assertThat(blockEntity.getHasCancelled()).isEqualTo(expectedBlockEntity.getHasCancelled());
         assertThat(blockEntity.getReplacementRequired()).isEqualTo(expectedBlockEntity.getReplacementRequired());
+
+        assertThat(blockEntity.getNoPerforation()).isEqualTo(expectedBlockEntity.getNoPerforation());
 
         assertThat(blockEntity.getTags()).containsExactlyInAnyOrderElementsOf(expectedBlockEntity.getTags());
 

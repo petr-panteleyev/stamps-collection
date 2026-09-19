@@ -32,7 +32,6 @@ public class AlbumEntity {
     private List<AlbumEntity> subalbums;
     private Integer startYear;
     private Integer endYear;
-    private Boolean noTags;
     private Set<TagEntity> tags = new HashSet<>();
     private Set<TagEntity> excludedTags = new HashSet<>();
 
@@ -117,15 +116,6 @@ public class AlbumEntity {
 
     public AlbumEntity setEndYear(Integer endYear) {
         this.endYear = endYear;
-        return this;
-    }
-
-    public Boolean getNoTags() {
-        return noTags;
-    }
-
-    public AlbumEntity setNoTags(Boolean noTags) {
-        this.noTags = noTags;
         return this;
     }
 

@@ -20,13 +20,13 @@ public class RegionConverterTest {
         var dto = new RegionDTO()
                 .id(ID)
                 .name("name")
-                .yearStart(2001)
-                .yearEnd(2010);
+                .startYear(2001)
+                .endYear(2010);
         var expected = new RegionEntity()
                 .setId(ID)
                 .setName("name")
-                .setYearStart(2001)
-                .setYearEnd(2010);
+                .setStartYear(2001)
+                .setEndYear(2010);
 
         assertThat(converter.regionDTOToEntity(dto)).isEqualTo(expected);
     }
@@ -36,13 +36,13 @@ public class RegionConverterTest {
         var entity = new RegionEntity()
                 .setId(ID)
                 .setName("name")
-                .setYearStart(2001)
-                .setYearEnd(2010);
+                .setStartYear(2001)
+                .setEndYear(2010);
         var expected = new RegionDTO()
                 .id(ID)
                 .name("name")
-                .yearStart(2001)
-                .yearEnd(2010);
+                .startYear(2001)
+                .endYear(2010);
 
         assertThat(converter.entityToRegionDTO(entity)).isEqualTo(expected);
     }

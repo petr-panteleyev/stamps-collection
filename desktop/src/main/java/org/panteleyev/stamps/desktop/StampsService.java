@@ -7,13 +7,16 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.image.Image;
 import org.panteleyev.stamps.client.StampsClient;
+import org.panteleyev.stamps.desktop.converter.RegionConverter;
+import org.panteleyev.stamps.desktop.converter.TagConverter;
+import org.panteleyev.stamps.desktop.model.CollectionRegion;
+import org.panteleyev.stamps.desktop.model.CollectionTag;
 import org.panteleyev.stamps.dto.AlbumDTO;
 import org.panteleyev.stamps.dto.BlockDTO;
 import org.panteleyev.stamps.dto.CouplingDTO;
 import org.panteleyev.stamps.dto.ImageUploadDTO;
 import org.panteleyev.stamps.dto.IssueDTO;
 import org.panteleyev.stamps.dto.ItemPatchDTO;
-import org.panteleyev.stamps.dto.RegionDTO;
 import org.panteleyev.stamps.dto.StampDTO;
 import org.panteleyev.stamps.dto.TagDTO;
 
@@ -26,6 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static org.panteleyev.stamps.desktop.converter.TagConverter.modelToDto;
 import static org.panteleyev.stamps.desktop.util.DtoUtils.normalize;
 
 public class StampsService {
@@ -54,37 +58,41 @@ public class StampsService {
         return connectedProperty;
     }
 
-    public List<RegionDTO> loadRegions() {
+    public List<CollectionRegion> loadRegions() {
         lock.lock();
         try {
-            return client.getRegions().right().orElseThrow();
+            return client.getRegions().right().orElseThrow().stream()
+                    .map(RegionConverter::dtoToModel)
+                    .toList();
         } finally {
             lock.unlock();
         }
     }
 
-    public List<TagDTO> loadTags() {
+    public List<CollectionTag> loadTags() {
         lock.lock();
         try {
-            return client.getTags().right().orElseThrow();
+            return client.getTags().right().orElseThrow().stream()
+                    .map(TagConverter::dtoToModel)
+                    .toList();
         } finally {
             lock.unlock();
         }
     }
 
-    public TagDTO createTag(TagDTO tag) {
+    public TagDTO createTag(CollectionTag tag) {
         lock.lock();
         try {
-            return client.postTag(tag).right().orElseThrow();
+            return client.postTag(modelToDto(tag)).right().orElseThrow();
         } finally {
             lock.unlock();
         }
     }
 
-    public TagDTO updateTag(TagDTO tag) {
+    public TagDTO updateTag(CollectionTag tag) {
         lock.lock();
         try {
-            return client.putTag(tag).right().orElseThrow();
+            return client.putTag(modelToDto(tag)).right().orElseThrow();
         } finally {
             lock.unlock();
         }
@@ -94,14 +102,7 @@ public class StampsService {
         lock.lock();
 
         try {
-            var tags = "";
-            if (!normalize(album.getNoTags())) {
-                if (album.getTags() == null || album.getTags().isEmpty()) {
-                    tags = null;
-                } else {
-                    tags = String.join(",", album.getTags());
-                }
-            }
+            var tags = String.join(",", normalize(album.getTags()));
             var excludedTags = String.join(",", normalize(album.getExcludedTags()));
 
             return client.getIssues(album.getRegion(), album.getStartYear(), album.getEndYear(), tags, excludedTags)

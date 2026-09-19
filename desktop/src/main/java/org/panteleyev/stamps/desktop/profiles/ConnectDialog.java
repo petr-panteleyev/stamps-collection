@@ -2,18 +2,23 @@
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.stamps.desktop.profiles;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
-import javafx.scene.layout.GridPane;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.ToStringConverter;
 
+import java.util.List;
 import java.util.Objects;
 
 import static java.util.Objects.requireNonNull;
 import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.fx.factories.grid.GridCell.gridCell;
+import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
+import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
+import static org.panteleyev.stamps.desktop.settings.Settings.settings;
 import static org.panteleyev.stamps.desktop.ui.MainWindowController.UI;
 import static org.panteleyev.stamps.desktop.ui.Styles.GRID_PANE;
 
@@ -25,7 +30,7 @@ public class ConnectDialog extends BaseDialog<ConnectionProfile> {
     private final ConnectionProfileManager profileManager;
 
     public ConnectDialog(ConnectionProfileManager profileManager) {
-//        super(settings().getDialogCssFileUrl());
+        super(settings().getDialogCssFilePath());
         this.profileManager = requireNonNull(profileManager);
 
         profileComboBox = initProfileComboBox();
@@ -34,15 +39,13 @@ public class ConnectDialog extends BaseDialog<ConnectionProfile> {
 
         setTitle("Соединение");
 
-        var pane = new GridPane();
-        pane.getStyleClass().add(GRID_PANE);
-        pane.addRow(0, label("Профиль:"), profileComboBox);
-        pane.addRow(1, defaultCheck);
-        pane.addRow(2, autoConnectCheck);
-        getDialogPane().setContent(pane);
+        var pane = gridPane(List.of(
+                gridRow(label("Профиль:"), profileComboBox),
+                gridRow(gridCell(defaultCheck, 2, 1)),
+                gridRow(gridCell(autoConnectCheck, 2, 1))
+        ), List.of(), List.of(GRID_PANE));
 
-        GridPane.setColumnSpan(defaultCheck, 2);
-        GridPane.setColumnSpan(autoConnectCheck, 2);
+        getDialogPane().setContent(pane);
 
         profileComboBox.setMaxWidth(Double.MAX_VALUE);
 
@@ -61,6 +64,8 @@ public class ConnectDialog extends BaseDialog<ConnectionProfile> {
                 return null;
             }
         });
+
+        Platform.runLater(profileComboBox::requestFocus);
     }
 
     private ComboBox<ConnectionProfile> initProfileComboBox() {

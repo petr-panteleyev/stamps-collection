@@ -27,20 +27,21 @@ public class CouplingConverter {
         var entity = new IssueItemEntity();
         entity.setId(dto.getId() == null ? UUID.randomUUID() : dto.getId());
 
-        entity.setType(IssueItemType.COUPLING);
-        entity.setIssue(issue);
-        entity.setYear(issue.getYear());
-        entity.setNumberZag(issueNumbers.isEmpty() ? 0 : issueNumbers.getFirst());
-        entity.setDenomination(BigDecimal.ZERO);
-        entity.setDescription("");
-        entity.setHasClean(convertBoolean(dto.getHasClean()));
-        entity.setHasCancelled(convertBoolean(dto.getHasCancelled()));
-        entity.setReplacementRequired(convertBoolean(dto.getReplacementRequired()));
-        entity.setComment(convertString(dto.getComment()));
-        entity.setCouplingItems(
-                dto.getStampNumbers().stream().map(i -> Integer.toString(i)).collect(Collectors.joining(","))
-        );
-        entity.setTags(stamps.stream().flatMap(s -> s.getTags().stream()).collect(Collectors.toSet()));
+        entity.setType(IssueItemType.COUPLING)
+                .setIssue(issue)
+                .setYear(issue.getYear())
+                .setNumberZag(issueNumbers.isEmpty() ? 0 : issueNumbers.getFirst())
+                .setDenomination(BigDecimal.ZERO)
+                .setDescription("")
+                .setHasClean(convertBoolean(dto.getHasClean()))
+                .setHasCancelled(convertBoolean(dto.getHasCancelled()))
+                .setReplacementRequired(convertBoolean(dto.getReplacementRequired()))
+                .setNoPerforation(convertBoolean(dto.getNoPerforation()))
+                .setComment(convertString(dto.getComment()))
+                .setCouplingItems(
+                        dto.getStampNumbers().stream().map(i -> Integer.toString(i)).collect(Collectors.joining(","))
+                )
+                .setTags(stamps.stream().flatMap(s -> s.getTags().stream()).collect(Collectors.toSet()));
 
         return entity;
     }
@@ -58,6 +59,7 @@ public class CouplingConverter {
                 .hasClean(entity.getHasClean())
                 .hasCancelled(entity.getHasCancelled())
                 .replacementRequired(entity.getReplacementRequired())
+                .noPerforation(entity.getNoPerforation())
                 .comment(entity.getComment())
                 .stampNumbers(stamps);
     }

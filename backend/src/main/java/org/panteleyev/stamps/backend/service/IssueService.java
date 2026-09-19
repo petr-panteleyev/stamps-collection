@@ -50,7 +50,7 @@ public class IssueService {
     public List<IssueDTO> getIssues(String region, Integer yearStart, Integer yearEnd, String tags,
             String excludedTags)
     {
-        var setOfTags = tags == null ?
+        var setOfTags = tags == null || tags.isBlank() ?
                 null :
                 Arrays.stream(tags.split(","))
                         .map(String::trim)

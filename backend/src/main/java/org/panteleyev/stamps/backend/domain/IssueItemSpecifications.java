@@ -24,8 +24,8 @@ public final class IssueItemSpecifications {
 
     public static Specification<IssueItemEntity> hasTags(Collection<String> tags) {
         return (root, _, cb) -> {
-            if (tags == null) return cb.conjunction();
-            return tags.isEmpty() ? cb.isEmpty(root.get("tags")) : root.join("tags").get("name").in(tags);
+            if (tags == null || tags.isEmpty()) return cb.conjunction();
+            return root.join("tags").get("name").in(tags);
         };
     }
 

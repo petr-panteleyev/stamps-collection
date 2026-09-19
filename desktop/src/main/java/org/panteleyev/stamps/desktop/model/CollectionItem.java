@@ -44,6 +44,7 @@ public class CollectionItem {
     private final int numberCfa;
     private final String description;
     private final String comment;
+    private final boolean noPerforation;
     // Fields updatable directly from the table view
     private boolean hasClean = false;
     private boolean hasCancelled = false;
@@ -90,6 +91,7 @@ public class CollectionItem {
                 hasClean = normalize(item.getHasClean());
                 hasCancelled = normalize(item.getHasCancelled());
                 replacementRequired = normalize(item.getReplacementRequired());
+                noPerforation = normalize(item.getNoPerforation());
             }
             case IssueDTO issue -> {
                 hasClean = issue.getStamps().stream().anyMatch(b -> normalize(b.getHasClean()))
@@ -103,9 +105,10 @@ public class CollectionItem {
                 replacementRequired = issue.getStamps().stream().anyMatch(b -> normalize(b.getReplacementRequired()))
                         || issue.getBlocks().stream().anyMatch(b -> normalize(b.getReplacementRequired()))
                         || issue.getCouplings().stream().anyMatch(c -> normalize(c.getReplacementRequired()));
+
+                noPerforation = false;
             }
-            default -> {
-            }
+            default -> noPerforation = false;
         }
     }
 
@@ -135,6 +138,10 @@ public class CollectionItem {
 
     public String getComment() {
         return comment;
+    }
+
+    public boolean getNoPerforation() {
+        return noPerforation;
     }
 
     public boolean isIssue() {

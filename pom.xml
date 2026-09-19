@@ -12,9 +12,9 @@
     <name>Stamps</name>
 
     <properties>
-        <revision>26.9.3</revision>
+        <revision>26.9.4</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>26</maven.compiler.release>
+        <maven.compiler.release>27</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
         <timestamp>${maven.build.timestamp}</timestamp>
         <!-- Plugins -->
@@ -29,7 +29,7 @@
         <flattenMavenPluginVersion>1.6.0</flattenMavenPluginVersion>
         <openapiGeneratorMavenPluginVersion>7.23.0</openapiGeneratorMavenPluginVersion>
         <!-- Dependencies -->
-        <javaFxVersion>26.0.2</javaFxVersion>
+        <javaFxVersion>27</javaFxVersion>
         <javaFxHelpersVersion>2.5.2</javaFxHelpersVersion>
         <javaFreeDesktopVersion>0.5.1</javaFreeDesktopVersion>
         <javaCommonsVersion>1.8.0</javaCommonsVersion>
@@ -45,7 +45,7 @@
     </properties>
 
     <modules>
-        <module>dto</module>
+<!--        <module>dto</module>-->
         <module>desktop</module>
         <module>backend</module>
         <module>client</module>
