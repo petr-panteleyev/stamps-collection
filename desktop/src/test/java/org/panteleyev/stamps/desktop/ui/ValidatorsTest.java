@@ -13,6 +13,8 @@ public class ValidatorsTest {
     @CsvSource(
             value = {
                     "NULL, 0, false",
+                    "'', 0, false",
+                    "'   ', 0, false",
                     "100, 0, true",
                     "-1, 0, false",
                     "0, 0, true",
@@ -22,5 +24,23 @@ public class ValidatorsTest {
     )
     public void testValidateInteger(String value, int minValue, boolean expected) {
         assertThat(Validators.validateInteger(value, minValue)).isEqualTo(expected);
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+            value = {
+                    "NULL, false",
+                    "'   ', false",
+                    "'', false",
+                    "aa, false",
+                    "100, true",
+                    "100.12, true",
+                    "-1, false",
+                    "0, false",
+            },
+            nullValues = "NULL"
+    )
+    public void testValidateBigDecimal(String value, boolean expected) {
+        assertThat(Validators.validateBigDecimal(value)).isEqualTo(expected);
     }
 }

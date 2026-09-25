@@ -44,6 +44,7 @@ public class BlockConverterTest {
                                 .replacementRequired(true)
                                 .numberZag(1000)
                                 .numberCfa(2000)
+                                .denomination(BigDecimal.TEN)
                                 .noPerforation(true)
                                 .stamps(List.of(
                                         new StampDTO()
@@ -68,7 +69,7 @@ public class BlockConverterTest {
                                         .setYear(2026)
                                         .setNumberZag(1000)
                                         .setNumberCfa(2000)
-                                        .setDenomination(BigDecimal.ZERO)
+                                        .setDenomination(BigDecimal.TEN)
                                         .setHasCancelled(true)
                                         .setHasClean(true)
                                         .setReplacementRequired(true)

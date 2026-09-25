@@ -26,7 +26,8 @@ public interface IssueItemRepository extends JpaRepository<IssueItemEntity, UUID
             UPDATE issue_item SET
                 has_clean = COALESCE(:#{#patch.hasClean}, has_clean),
                 has_cancelled = COALESCE(:#{#patch.hasCancelled}, has_cancelled),
-                repl_required = COALESCE(:#{#patch.replacementRequired}, repl_required)
+                repl_required = COALESCE(:#{#patch.replacementRequired}, repl_required),
+                comment = COALESCE(:#{#patch.comment}, comment)
             WHERE id = :id
             """,
             nativeQuery = true

@@ -21,7 +21,10 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,env,beans,prometheus
+        include: health,info,env,beans,prometheus,shutdown
+  endpoint:
+    shutdown:
+      enabled: true
   metrics:
     export:
       prometheus:

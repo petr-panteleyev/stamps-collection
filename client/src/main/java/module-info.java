@@ -15,5 +15,4 @@ module stamps.client {
     requires org.jspecify;
 
     requires transitive org.panteleyev.functional;
-//    requires org.panteleyev.stamps.dto;
 }

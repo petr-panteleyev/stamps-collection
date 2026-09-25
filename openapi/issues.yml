@@ -73,6 +73,28 @@ paths:
                 $ref: '#/components/schemas/IssueDTO'
 
   /api/v1/issues/{id}:
+    get:
+      tags:
+        - 'issues, v1'
+      summary: 'Получить выпуск почтовых марок'
+      operationId: getIssue
+      parameters:
+        - name: id
+          description: 'Идентификатор выпуска'
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: 'Success'
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/IssueDTO'
+
     delete:
       tags:
         - 'issues, v1'

@@ -43,12 +43,13 @@ public class CollectionItem {
     private final int numberZag;
     private final int numberCfa;
     private final String description;
-    private final String comment;
     private final boolean noPerforation;
+    private final Integer stampBlockNumber;
     // Fields updatable directly from the table view
     private boolean hasClean = false;
     private boolean hasCancelled = false;
     private boolean replacementRequired = false;
+    private String comment;
 
     public CollectionItem(Object data, IssueDTO parent) {
         this.data = requireNonNull(data);
@@ -62,7 +63,11 @@ public class CollectionItem {
 
         year = parent.getDate().getYear();
 
-        denomination = data instanceof StampDTO stamp ? stamp.getDenomination() : null;
+        denomination = switch (data) {
+            case StampDTO stamp -> normalize(stamp.getDenomination());
+            case BlockDTO block -> normalize(block.getDenomination());
+            default -> null;
+        };
 
         numberZag = switch (data) {
             case StampDTO stamp -> normalize(stamp.getNumberZag());
@@ -85,6 +90,8 @@ public class CollectionItem {
         };
 
         comment = data instanceof IssueItemDTO item ? item.getComment() : "";
+
+        stampBlockNumber = data instanceof StampDTO stamp ? stamp.getBlockNumber() : null;
 
         switch (data) {
             case IssueItemDTO item -> {
@@ -140,8 +147,16 @@ public class CollectionItem {
         return comment;
     }
 
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
     public boolean getNoPerforation() {
         return noPerforation;
+    }
+
+    public Integer getStampBlockNumber() {
+        return stampBlockNumber;
     }
 
     public boolean isIssue() {
@@ -190,5 +205,9 @@ public class CollectionItem {
 
     public IssueDTO getParent() {
         return parent;
+    }
+
+    public boolean isEditable() {
+        return !isIssue() && stampBlockNumber == null;
     }
 }

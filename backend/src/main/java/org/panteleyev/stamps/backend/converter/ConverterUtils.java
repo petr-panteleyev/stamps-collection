@@ -2,8 +2,7 @@
 // SPDX-License-Identifier: BSD-2-Clause
 package org.panteleyev.stamps.backend.converter;
 
-import org.jspecify.annotations.Nullable;
-
+import java.math.BigDecimal;
 import java.util.List;
 
 public final class ConverterUtils {
@@ -18,6 +17,10 @@ public final class ConverterUtils {
 
     public static <T> List<T> convert(List<T> list) {
         return list == null ? List.of() : list;
+    }
+
+    public static BigDecimal convertBigDecimal(BigDecimal value) {
+        return value == null ? BigDecimal.ZERO : value;
     }
 
     private ConverterUtils() {

@@ -18,8 +18,6 @@ import java.util.List;
 
 import static javafx.application.Platform.runLater;
 import static org.panteleyev.fx.factories.LabelFactory.label;
-import static org.panteleyev.fx.factories.StringFactory.COLON;
-import static org.panteleyev.fx.factories.StringFactory.string;
 import static org.panteleyev.fx.factories.grid.GridCell.gridCell;
 import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
 import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
@@ -27,9 +25,11 @@ import static org.panteleyev.stamps.desktop.GlobalContext.stampsService;
 import static org.panteleyev.stamps.desktop.settings.Settings.settings;
 import static org.panteleyev.stamps.desktop.ui.MainWindowController.UI;
 import static org.panteleyev.stamps.desktop.ui.Styles.GRID_PANE;
+import static org.panteleyev.stamps.desktop.ui.Validators.DECIMAL_VALIDATOR;
 import static org.panteleyev.stamps.desktop.ui.Validators.INTEGER_OR_ZERO_VALIDATOR;
 import static org.panteleyev.stamps.desktop.ui.Validators.INTEGER_VALIDATOR;
 import static org.panteleyev.stamps.desktop.ui.Validators.STRING_NOT_EMPTY_VALIDATOR;
+import static org.panteleyev.stamps.desktop.util.StringUtil.toBigDecimalOrNull;
 import static org.panteleyev.stamps.desktop.util.StringUtil.toIntOrNull;
 import static org.panteleyev.stamps.desktop.util.StringUtil.toStringOrEmpty;
 
@@ -38,6 +38,7 @@ public class BlockDialog extends BaseDialog<BlockDTO> {
 
     private final TextField zagNumberEdit = new TextField();
     private final TextField cfaNumberEdit = new TextField();
+    private final TextField denominationEdit = new TextField();
     private final TextField descriptionEdit = new TextField();
     private final CheckBox noPerforationCheckBox = new CheckBox("Без перфорации");
     private final CheckBox hasCleanCheckBox = new CheckBox("Чистый");
@@ -48,7 +49,7 @@ public class BlockDialog extends BaseDialog<BlockDTO> {
 
     private final ValidationSupport validation = new ValidationSupport();
 
-    public BlockDialog(BlockDTO block) {
+    public BlockDialog(BlockDTO block, boolean hasStamps) {
         super(settings().getDialogCssFilePath());
 
         this.block = block;
@@ -56,12 +57,13 @@ public class BlockDialog extends BaseDialog<BlockDTO> {
         setTitle("Блок");
 
         var root = gridPane(List.of(
-                gridRow(label(string("Номер по Загорскому", COLON)), zagNumberEdit),
-                gridRow(label(string("Номер по ЦФА", COLON)), cfaNumberEdit),
-                gridRow(label(string("Описание", COLON)), descriptionEdit),
+                gridRow(label("Номер по Загорскому:"), zagNumberEdit),
+                gridRow(label("Номер по ЦФА:"), cfaNumberEdit),
+                gridRow(label("Номинал:"), denominationEdit),
+                gridRow(label("Описание:"), descriptionEdit),
                 gridRow(gridCell(noPerforationCheckBox, 2, 1)),
-                gridRow(label(string("Комментарий", COLON)), commentEdit),
-                gridRow(label(string("Теги", COLON)), tagsComboBox),
+                gridRow(label("Комментарий:"), commentEdit),
+                gridRow(label("Теги:"), tagsComboBox),
                 gridRow(gridCell(label("В наличии:"), 2, 1)),
                 gridRow(gridCell(hasCleanCheckBox, 2, 1)),
                 gridRow(gridCell(hasCancelledCheckBox, 2, 1)),
@@ -73,12 +75,13 @@ public class BlockDialog extends BaseDialog<BlockDTO> {
         var okButton = (Button) getDialogPane().lookupButton(ButtonType.OK);
         okButton.disableProperty().bind(validation.invalidProperty());
 
-        setupData();
+        setupData(hasStamps);
 
         setResultConverter(buttonType -> {
             if (buttonType != ButtonType.OK) return null;
             return block.numberZag(toIntOrNull(zagNumberEdit.getText()))
                     .numberCfa(toIntOrNull(cfaNumberEdit.getText()))
+                    .denomination(toBigDecimalOrNull(denominationEdit.getText()))
                     .description(descriptionEdit.getText())
                     .noPerforation(noPerforationCheckBox.isSelected())
                     .hasClean(hasCleanCheckBox.isSelected())
@@ -94,7 +97,7 @@ public class BlockDialog extends BaseDialog<BlockDTO> {
         });
     }
 
-    private void setupData() {
+    private void setupData(boolean hasStamps) {
         zagNumberEdit.setText(toStringOrEmpty(block.getNumberZag()));
         cfaNumberEdit.setText(toStringOrEmpty(block.getNumberCfa()));
         descriptionEdit.setText(block.getDescription());
@@ -103,6 +106,13 @@ public class BlockDialog extends BaseDialog<BlockDTO> {
         hasCancelledCheckBox.setSelected(DtoUtils.normalize(block.getHasCancelled()));
         replacementCheckBox.setSelected(DtoUtils.normalize(block.getReplacementRequired()));
         commentEdit.setText(block.getComment());
+
+        denominationEdit.setDisable(hasStamps);
+        if (hasStamps) {
+            denominationEdit.setText("");
+        } else {
+            denominationEdit.setText(toStringOrEmpty(block.getDenomination()));
+        }
 
         var allTags = stampsService().loadTags().stream().map(CollectionTag::name).sorted().toList();
         tagsComboBox.getItems().setAll(FXCollections.observableArrayList(allTags));
@@ -117,6 +127,7 @@ public class BlockDialog extends BaseDialog<BlockDTO> {
         validation.registerValidator(zagNumberEdit, INTEGER_VALIDATOR);
         validation.registerValidator(cfaNumberEdit, INTEGER_OR_ZERO_VALIDATOR);
         validation.registerValidator(descriptionEdit, STRING_NOT_EMPTY_VALIDATOR);
+        validation.registerValidator(denominationEdit, DECIMAL_VALIDATOR);
         validation.initInitialDecoration();
     }
 }

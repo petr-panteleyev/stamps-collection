@@ -14,6 +14,7 @@ public class ItemNumberZagCell extends TableCell<CollectionItem, CollectionItem>
 
         var number = item.getNumberZag();
         if (number == 0) return;
-        setText((item.isBlock() ? "Бл " : "") + number);
+        var prefix = item.getStampBlockNumber() == null ? "" : "- ";
+        setText(prefix + (item.isBlock() ? "Бл " : "") + number);
     }
 }

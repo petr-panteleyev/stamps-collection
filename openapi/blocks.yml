@@ -90,6 +90,9 @@ components:
         numberCfa:
           type: integer
           description: 'Номер по каталогу ЦФА (для СССР)'
+        denomination:
+          type: number
+          description: 'Номинал блока, если нет отдельных марок'
         description:
           type: string
           description: 'Описание почтового блока'

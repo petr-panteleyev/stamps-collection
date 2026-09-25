@@ -12,7 +12,7 @@
     <name>Stamps</name>
 
     <properties>
-        <revision>26.9.4</revision>
+        <revision>26.9.5</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>27</maven.compiler.release>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>

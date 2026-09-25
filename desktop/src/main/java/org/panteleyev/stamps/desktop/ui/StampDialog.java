@@ -18,8 +18,6 @@ import java.util.List;
 
 import static javafx.application.Platform.runLater;
 import static org.panteleyev.fx.factories.LabelFactory.label;
-import static org.panteleyev.fx.factories.StringFactory.COLON;
-import static org.panteleyev.fx.factories.StringFactory.string;
 import static org.panteleyev.fx.factories.grid.GridCell.gridCell;
 import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
 import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
@@ -59,13 +57,13 @@ public class StampDialog extends BaseDialog<StampDTO> {
         setTitle("Марка");
 
         var root = gridPane(List.of(
-                gridRow(label(string("Номер по Загорскому", COLON)), zagNumberEdit),
-                gridRow(label(string("Номер по ЦФА", COLON)), cfaNumberEdit),
-                gridRow(label(string("Номинал", COLON)), denominationEdit),
-                gridRow(label(string("Описание", COLON)), descriptionEdit),
+                gridRow(label("Номер по Загорскому:"), zagNumberEdit),
+                gridRow(label("Номер по ЦФА:"), cfaNumberEdit),
+                gridRow(label("Номинал:"), denominationEdit),
+                gridRow(label("Описание:"), descriptionEdit),
                 gridRow(gridCell(noPerforationCheckBox, 2, 1)),
-                gridRow(label(string("Комментарий", COLON)), commentEdit),
-                gridRow(label(string("Теги", COLON)), tagsComboBox),
+                gridRow(label("Комментарий:"), commentEdit),
+                gridRow(label("Теги:"), tagsComboBox),
                 gridRow(gridCell(label("В наличии:"), 2, 1)),
                 gridRow(gridCell(hasCleanCheckBox, 2, 1)),
                 gridRow(gridCell(hasCancelledCheckBox, 2, 1)),

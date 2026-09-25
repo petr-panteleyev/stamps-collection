@@ -3,12 +3,9 @@
 package org.panteleyev.stamps.desktop.ui.cells;
 
 import javafx.scene.control.TreeTableCell;
-import org.panteleyev.stamps.dto.BlockDTO;
-import org.panteleyev.stamps.dto.CouplingDTO;
-import org.panteleyev.stamps.dto.IssueDTO;
 import org.panteleyev.stamps.dto.StampDTO;
 
-import java.util.stream.Collectors;
+import java.math.RoundingMode;
 
 public class ItemDenominationCell extends TreeTableCell<Object, Object> {
     @Override
@@ -24,14 +21,8 @@ public class ItemDenominationCell extends TreeTableCell<Object, Object> {
         };
 
         var text = denomination == null ? ""
-                : denomination.toString();
+                : denomination.setScale(2, RoundingMode.HALF_UP).toString();
 
         setText(text);
-    }
-
-    private static String getCouplingDescription(CouplingDTO coupling) {
-        return "Сцепка марок " + coupling.getStampNumbers().stream()
-                .map(n -> Integer.toString(n))
-                .collect(Collectors.joining(","));
     }
 }

@@ -5,7 +5,9 @@ package org.panteleyev.stamps.desktop.ui.table;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableCell;
 import org.panteleyev.stamps.desktop.model.CollectionItem;
+import org.panteleyev.stamps.desktop.ui.CollectionTableView;
 import org.panteleyev.stamps.desktop.util.DtoUtils;
+import org.panteleyev.stamps.dto.BlockDTO;
 import org.panteleyev.stamps.dto.IssueItemDTO;
 import org.panteleyev.stamps.dto.ItemPatchDTO;
 
@@ -17,7 +19,7 @@ public class ItemHasCancelledCell extends TableCell<CollectionItem, CollectionIt
         super.updateItem(item, empty);
         setText(null);
         setGraphic(null);
-        if (item == null || empty || item.isIssue()) return;
+        if (item == null || empty || !item.isEditable()) return;
 
         var checkBox = new CheckBox();
         checkBox.setSelected(item.getHasCancelled());
@@ -26,6 +28,12 @@ public class ItemHasCancelledCell extends TableCell<CollectionItem, CollectionIt
                     .hasCancelled(checkBox.isSelected()));
             if (patched instanceof IssueItemDTO issueItem) {
                 item.setHasCancelled(DtoUtils.normalize(issueItem.getHasCancelled()));
+            }
+            if (patched instanceof BlockDTO block && getTableView() instanceof CollectionTableView view) {
+                var blockStampIds = DtoUtils.getBlockStampIds(block);
+                view.getUnfilteredItems().stream()
+                        .filter(i -> blockStampIds.contains(i.getId()))
+                        .forEach(i -> i.setHasCancelled(DtoUtils.normalize(block.getHasCancelled())));
             }
             this.getTableView().refresh();
         });

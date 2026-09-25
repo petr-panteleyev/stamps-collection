@@ -126,11 +126,13 @@ public class IssueItemRepositoryIT extends BaseSpringBootTest {
                         new ItemPatchDTO()
                                 .hasClean(true)
                                 .hasCancelled(true)
-                                .replacementRequired(true),
+                                .replacementRequired(true)
+                                .comment("New comment"),
                         new IssueItemEntity()
                                 .setHasClean(true)
                                 .setHasCancelled(true)
                                 .setReplacementRequired(true)
+                                .setComment("New comment")
                 ),
                 argumentSet("No columns",
                         new ItemPatchDTO(),
@@ -138,6 +140,7 @@ public class IssueItemRepositoryIT extends BaseSpringBootTest {
                                 .setHasClean(false)
                                 .setHasCancelled(false)
                                 .setReplacementRequired(false)
+                                .setComment("Old comment")
                 ),
                 argumentSet("One column",
                         new ItemPatchDTO().replacementRequired(true),
@@ -145,6 +148,7 @@ public class IssueItemRepositoryIT extends BaseSpringBootTest {
                                 .setHasClean(false)
                                 .setHasCancelled(false)
                                 .setReplacementRequired(true)
+                                .setComment("Old comment")
                 )
         );
     }
@@ -164,5 +168,6 @@ public class IssueItemRepositoryIT extends BaseSpringBootTest {
         assertThat(actual.getHasClean()).isEqualTo(expected.getHasClean());
         assertThat(actual.getHasCancelled()).isEqualTo(expected.getHasCancelled());
         assertThat(actual.getReplacementRequired()).isEqualTo(expected.getReplacementRequired());
+        assertThat(actual.getComment()).isEqualTo(expected.getComment());
     }
 }

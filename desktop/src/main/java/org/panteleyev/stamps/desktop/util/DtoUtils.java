@@ -9,15 +9,20 @@ import org.panteleyev.stamps.dto.IssueDTO;
 import org.panteleyev.stamps.dto.RegionDTO;
 import org.panteleyev.stamps.dto.StampDTO;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 public final class DtoUtils {
     public static final Comparator<RegionDTO> REGION_COMPATAOR_BY_NAME = Comparator.comparing(RegionDTO::getName);
 
     public static final Comparator<IssueDTO> ISSUE_COMPARATOR_BY_DATE = Comparator.comparing(IssueDTO::getDate);
+    public static final Comparator<IssueDTO> ISSUE_COMPARATOR_BY_STAMP
+            = Comparator.comparing(DtoUtils::getFirstStampNumber);
 
     public static final Comparator<StampDTO> STAMP_COMPARATOR_BY_NUMBER_ZAG = Comparator.comparingInt(
             StampDTO::getNumberZag);
@@ -38,6 +43,11 @@ public final class DtoUtils {
 
     public static <T> List<T> normalize(List<T> list) {
         return list == null ? List.of() : list;
+    }
+
+    public static BigDecimal normalize(BigDecimal value) {
+        if (value == null) return null;
+        return value.setScale(2, RoundingMode.HALF_UP);
     }
 
     /// Makes a copy of [StampDTO].
@@ -140,6 +150,28 @@ public final class DtoUtils {
         return "Сцепка марок " + coupling.getStampNumbers().stream()
                 .map(n -> Integer.toString(n))
                 .collect(Collectors.joining(","));
+    }
+
+    public static Integer getFirstStampNumber(IssueDTO dto) {
+        if (!dto.getStamps().isEmpty()) {
+            return dto.getStamps().getFirst().getNumberZag();
+        }
+
+        if (!dto.getBlocks().isEmpty()) {
+            var block = dto.getBlocks().getFirst();
+            if (!block.getStamps().isEmpty()) {
+                return block.getStamps().getFirst().getNumberZag();
+            }
+            return block.getNumberZag();
+        }
+
+        return 0;
+    }
+
+    public static List<UUID> getBlockStampIds(BlockDTO block) {
+        return block.getStamps().stream()
+                .map(StampDTO::getId)
+                .toList();
     }
 
     private DtoUtils() {

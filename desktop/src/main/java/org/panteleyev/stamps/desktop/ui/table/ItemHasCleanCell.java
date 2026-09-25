@@ -5,7 +5,9 @@ package org.panteleyev.stamps.desktop.ui.table;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TableCell;
 import org.panteleyev.stamps.desktop.model.CollectionItem;
+import org.panteleyev.stamps.desktop.ui.CollectionTableView;
 import org.panteleyev.stamps.desktop.util.DtoUtils;
+import org.panteleyev.stamps.dto.BlockDTO;
 import org.panteleyev.stamps.dto.IssueItemDTO;
 import org.panteleyev.stamps.dto.ItemPatchDTO;
 
@@ -18,7 +20,7 @@ public class ItemHasCleanCell extends TableCell<CollectionItem, CollectionItem> 
         super.updateItem(item, empty);
         setText(null);
         setGraphic(null);
-        if (item == null || empty || item.isIssue()) return;
+        if (item == null || empty || !item.isEditable()) return;
 
         var checkBox = new CheckBox();
         checkBox.setSelected(item.getHasClean());
@@ -28,7 +30,13 @@ public class ItemHasCleanCell extends TableCell<CollectionItem, CollectionItem> 
             if (patched instanceof IssueItemDTO issueItem) {
                 item.setHasClean(DtoUtils.normalize(issueItem.getHasClean()));
             }
-            this.getTableView().refresh();
+            if (patched instanceof BlockDTO block && getTableView() instanceof CollectionTableView view) {
+                var blockStampIds = DtoUtils.getBlockStampIds(block);
+                view.getUnfilteredItems().stream()
+                        .filter(i -> blockStampIds.contains(i.getId()))
+                        .forEach(i -> i.setHasClean(DtoUtils.normalize(block.getHasClean())));
+            }
+            getTableView().refresh();
         });
         setGraphic(checkBox);
     }

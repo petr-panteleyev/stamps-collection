@@ -55,6 +55,9 @@ components:
         replacementRequired:
           type: boolean
           description: 'Элемент нуждается в замене (например, поврежден'
+        comment:
+          type: string
+          description: 'Комментарий'
 
     ErrorDTO:
       type: object

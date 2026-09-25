@@ -22,8 +22,8 @@ import static org.panteleyev.stamps.desktop.ui.Styles.GRID_PANE;
 public class CouplingDialog extends BaseDialog<CouplingDTO> {
     private final CouplingDTO coupling;
 
-    private final CheckBox hasCleanCheckBox = new CheckBox("Чистый");
-    private final CheckBox hasCancelledCheckBox = new CheckBox("Гашёный");
+    private final CheckBox hasCleanCheckBox = new CheckBox("Чистая");
+    private final CheckBox hasCancelledCheckBox = new CheckBox("Гашёная");
     private final CheckBox replacementCheckBox = new CheckBox("Требуется замена");
     private final TextField commentEdit = new TextField();
 
@@ -32,7 +32,7 @@ public class CouplingDialog extends BaseDialog<CouplingDTO> {
 
         this.coupling = coupling;
 
-        setTitle("Блок");
+        setTitle("Сцепка");
 
         var root = gridPane(List.of(
                 gridRow(gridCell(hasCleanCheckBox, 2, 1)),

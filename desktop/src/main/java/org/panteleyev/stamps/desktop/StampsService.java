@@ -112,6 +112,16 @@ public class StampsService {
         }
     }
 
+    public IssueDTO loadIssue(UUID id) {
+        lock.lock();
+
+        try {
+            return client.getIssue(id).right().orElseThrow();
+        } finally {
+            lock.unlock();
+        }
+    }
+
     public IssueDTO createIssue(IssueDTO issue) {
         lock.lock();
         try {

@@ -28,6 +28,7 @@ import java.util.function.Predicate;
 
 import static org.panteleyev.stamps.desktop.ui.Styles.TABLE_IMAGE_SIZE;
 import static org.panteleyev.stamps.desktop.util.DtoUtils.ISSUE_COMPARATOR_BY_DATE;
+import static org.panteleyev.stamps.desktop.util.DtoUtils.ISSUE_COMPARATOR_BY_STAMP;
 
 public class CollectionTableView extends TableView<CollectionItem> {
     private final ObservableList<CollectionItem> list = FXCollections.observableArrayList();
@@ -58,7 +59,7 @@ public class CollectionTableView extends TableView<CollectionItem> {
         imageColumn.setCellFactory(_ -> new ItemImageCell());
         imageColumn.setMinWidth(TABLE_IMAGE_SIZE + 10);
 
-        var denominationColumn = TableFactory.<CollectionItem>tableObjectColumn("");
+        var denominationColumn = TableFactory.<CollectionItem>tableObjectColumn("Номинал");
         denominationColumn.setCellFactory(_ -> new ItemDenominationCell());
         denominationColumn.widthBinding(w.multiply(0.05));
 
@@ -96,12 +97,13 @@ public class CollectionTableView extends TableView<CollectionItem> {
         ));
 
         setRowFactory(_ -> new ItemTableRow());
+        setEditable(true);
     }
 
     public void setIssues(Collection<IssueDTO> issues) {
         list.clear();
         issues.stream()
-                .sorted(ISSUE_COMPARATOR_BY_DATE)
+                .sorted(ISSUE_COMPARATOR_BY_DATE.thenComparing(ISSUE_COMPARATOR_BY_STAMP))
                 .forEach(issue -> {
                     list.add(new CollectionItem(issue, issue));
                     for (var stamp : issue.getStamps()) {
@@ -112,6 +114,9 @@ public class CollectionTableView extends TableView<CollectionItem> {
                     }
                     for (var block : issue.getBlocks()) {
                         list.add(new CollectionItem(block, issue));
+                        for (var stamp : block.getStamps()) {
+                            list.add(new CollectionItem(stamp, issue));
+                        }
                     }
                 });
     }

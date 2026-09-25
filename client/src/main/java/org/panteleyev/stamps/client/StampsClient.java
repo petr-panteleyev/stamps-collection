@@ -157,6 +157,10 @@ public class StampsClient {
         return call(() -> issuesV1Api.getIssues(null, null, null, null, null));
     }
 
+    public Either<ClientError, IssueDTO> getIssue(UUID id) {
+        return call(() -> issuesV1Api.getIssue(id));
+    }
+
     public Either<ClientError, IssueDTO> postIssue(IssueDTO dto) {
         return call(() -> issuesV1Api.postIssue(dto));
     }

@@ -62,6 +62,8 @@ import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_ALT_B;
 import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_ALT_C;
 import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_ALT_F;
 import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_ALT_I;
+import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_ALT_P;
+import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_ALT_T;
 import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_E;
 import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_N;
 import static org.panteleyev.stamps.desktop.ui.Styles.TOOLTIP_BLOCK_IMAGE_SIZE;
@@ -111,8 +113,10 @@ public class MainWindowController extends BaseController {
             .onAction(this::onDeleteIssue).disableBinding(deleteIssueEnabled.not());
     private final FxAction uploadImageAction = fxAction("Загрузить изображение...")
             .onAction(this::onUploadImage).accelerator(SHORTCUT_ALT_I).disableBinding(uploadImageEnabled.not());
+    private final FxAction editProfilesAction = fxAction("Профили...")
+            .onAction(this::onProfiles).accelerator(SHORTCUT_ALT_P);
     private final FxAction editTagsAction = fxAction("Теги")
-            .onAction(this::onEditTags).disableBinding(tagsEditorEnabled.not());
+            .onAction(this::onEditTags).accelerator(SHORTCUT_ALT_T).disableBinding(tagsEditorEnabled.not());
     private final FxAction filterAction = fxAction("Фильтр...")
             .onAction(this::onFilter).accelerator(SHORTCUT_ALT_F).disableBinding(filterEnabled.not());
 
@@ -171,10 +175,10 @@ public class MainWindowController extends BaseController {
                 new SeparatorMenuItem(),
                 deleteIssueAction.createMenuItem(),
                 new SeparatorMenuItem(),
-                uploadImageAction.createMenuItem(),
-                new SeparatorMenuItem(),
-                editTagsAction.createMenuItem(),
-                new SeparatorMenuItem(),
+                uploadImageAction.createMenuItem()
+        );
+
+        var viewMenu = menu("Вид",
                 filterAction.createMenuItem()
         );
 
@@ -183,10 +187,13 @@ public class MainWindowController extends BaseController {
         editAlbumsMenuItem.setAccelerator(SHORTCUT_ALT_B);
         albumMenu.getItems().add(editAlbumsMenuItem);
 
-        var profilesMenuItem = menuItem("Профили", this::onProfiles);
-        var serviceMenu = menu("Сервис", profilesMenuItem);
+        var serviceMenu = menu("Сервис",
+                editProfilesAction.createMenuItem(),
+                new SeparatorMenuItem(),
+                editTagsAction.createMenuItem()
+        );
 
-        return menuBar(fileMenu, editMenu, albumMenu, serviceMenu,
+        return menuBar(fileMenu, editMenu, viewMenu, albumMenu, serviceMenu,
                 menu("Справка", menuItem("О приложении...", this::onAbout))
         );
     }
@@ -286,7 +293,7 @@ public class MainWindowController extends BaseController {
         var issue = getParentIssueDTO(view.getSelectionModel().getSelectedItem()).orElse(null);
         if (issue == null) return;
 
-        new IssueDialog(copy(issue)).showAndWait().ifPresent(updated -> {
+        new IssueDialog(stampsService().loadIssue(issue.getId())).showAndWait().ifPresent(updated -> {
             stampsService().updateIssue(updated);
             loadData();
         });
@@ -405,7 +412,7 @@ public class MainWindowController extends BaseController {
             editIssueEnabled.set(selected != null);
             deleteIssueEnabled.set(selected != null && selected.isIssue());
             uploadImageEnabled.set(
-                    selected != null && !selected.isIssue()
+                    selected != null && selected.isEditable()
             );
         }
     }

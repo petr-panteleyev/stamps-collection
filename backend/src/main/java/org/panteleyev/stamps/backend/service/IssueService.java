@@ -4,6 +4,7 @@ package org.panteleyev.stamps.backend.service;
 
 import org.panteleyev.stamps.backend.converter.IssueConverter;
 import org.panteleyev.stamps.backend.domain.IssueItemEntity;
+import org.panteleyev.stamps.backend.exception.IssueNotFoundException;
 import org.panteleyev.stamps.backend.exception.RegionNotFoundException;
 import org.panteleyev.stamps.backend.repository.IssueItemRepository;
 import org.panteleyev.stamps.backend.repository.IssueRepository;
@@ -86,6 +87,12 @@ public class IssueService {
                 .map(e -> converter.entityToDTO(e.getKey(), e.getValue()))
                 .sorted(Comparator.comparing(IssueDTO::getDate))
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public IssueDTO getIssue(UUID id) {
+        var entity = repository.findById(id).orElseThrow(() -> new IssueNotFoundException(id));
+        return converter.entityToDTO(entity, entity.getItems());
     }
 
     @Transactional

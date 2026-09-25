@@ -9,7 +9,6 @@ import org.panteleyev.stamps.backend.domain.TagEntity;
 import org.panteleyev.stamps.dto.BlockDTO;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -17,6 +16,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.panteleyev.stamps.backend.converter.ConverterUtils.convertBigDecimal;
 import static org.panteleyev.stamps.backend.converter.ConverterUtils.convertBoolean;
 import static org.panteleyev.stamps.backend.converter.ConverterUtils.convertString;
 import static org.panteleyev.stamps.backend.converter.IssueConverter.STAMP_BY_NUMBER_ZAG;
@@ -37,6 +37,7 @@ public class BlockConverter {
                 .year(entity.getYear())
                 .numberZag(entity.getNumberZag())
                 .numberCfa(entity.getNumberCfa())
+                .denomination(entity.getDenomination())
                 .description(entity.getDescription())
                 .hasClean(entity.getHasClean())
                 .hasCancelled(entity.getHasCancelled())
@@ -66,7 +67,7 @@ public class BlockConverter {
         entity.setYear(issue.getYear())
                 .setNumberZag(dto.getNumberZag())
                 .setNumberCfa(dto.getNumberCfa())
-                .setDenomination(BigDecimal.ZERO) // Номинал блока определяется марками
+                .setDenomination(convertBigDecimal(dto.getDenomination()))
                 .setDescription(convertString(dto.getDescription()))
                 .setHasClean(convertBoolean(dto.getHasClean()))
                 .setHasCancelled(convertBoolean(dto.getHasCancelled()))

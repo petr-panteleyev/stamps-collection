@@ -111,7 +111,7 @@ public class IssueDialog extends BaseDialog<IssueDTO> {
         treeTableView.setShowRoot(false);
         treeTableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-        var numberZagColumn = treeTableObjectColumn("Заг.");
+        var numberZagColumn = treeTableObjectColumn("Z");
         numberZagColumn.setCellFactory(_ -> new ItemNumberZagCell());
 
         var numberCfaColumn = treeTableObjectColumn("ЦФА");
@@ -173,7 +173,7 @@ public class IssueDialog extends BaseDialog<IssueDTO> {
     }
 
     private void onNewCoupling(ActionEvent ignored) {
-        var stamps = getSelectedStamps(treeTableView)                .stream()
+        var stamps = getSelectedStamps(treeTableView).stream()
                 .filter(s -> s.getBlockNumber() == null)
                 .toList();
         if (stamps.isEmpty()) return;
@@ -188,16 +188,18 @@ public class IssueDialog extends BaseDialog<IssueDTO> {
 
     private void onNewBlock(ActionEvent ignored) {
         var blockStamps = getSelectedStamps(treeTableView);
-        if (blockStamps.isEmpty()) return;
 
         new BlockDialog(new BlockDTO()
                 .numberZag(0)
                 .numberCfa(0)
-                .year(issue.getDate().getYear())
+                .year(issue.getDate().getYear()), !blockStamps.isEmpty()
         ).showAndWait().ifPresent(block -> {
             block.getStamps().addAll(blockStamps);
             for (var stamp : blockStamps) {
                 stamp.setBlockNumber(block.getNumberZag());
+                stamp.setHasClean(block.getHasClean());
+                stamp.setHasCancelled(block.getHasCancelled());
+                stamp.setReplacementRequired(block.getReplacementRequired());
             }
             issue.getStamps().removeAll(blockStamps);
             issue.getBlocks().add(block);
@@ -216,11 +218,17 @@ public class IssueDialog extends BaseDialog<IssueDTO> {
                         issue.getStamps().set(index, newStamp);
                         selected.setValue(newStamp);
                     });
-            case BlockDTO block -> new BlockDialog(copy(block)).showAndWait().ifPresent(newBlock -> {
-                var index = issue.getBlocks().indexOf(block);
-                issue.getBlocks().set(index, newBlock);
-                selected.setValue(newBlock);
-            });
+            case BlockDTO block ->
+                    new BlockDialog(copy(block), !block.getStamps().isEmpty()).showAndWait().ifPresent(newBlock -> {
+                        for (var stamp : newBlock.getStamps()) {
+                            stamp.setHasClean(newBlock.getHasClean());
+                            stamp.setHasCancelled(newBlock.getHasCancelled());
+                            stamp.setReplacementRequired(newBlock.getReplacementRequired());
+                        }
+                        var index = issue.getBlocks().indexOf(block);
+                        issue.getBlocks().set(index, newBlock);
+                        selected.setValue(newBlock);
+                    });
             case CouplingDTO coupling -> new CouplingDialog(copy(coupling)).showAndWait().ifPresent(newCoupling -> {
                 var index = issue.getCouplings().indexOf(coupling);
                 issue.getCouplings().set(index, newCoupling);
@@ -229,6 +237,7 @@ public class IssueDialog extends BaseDialog<IssueDTO> {
             default -> {
             }
         }
+        treeTableView.refresh();
     }
 
     private void onDelete(ActionEvent ignored) {
