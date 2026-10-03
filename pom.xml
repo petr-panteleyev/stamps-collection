@@ -37,7 +37,7 @@
         <controlsFxVersion>11.2.2</controlsFxVersion>
         <commonsIoVersion>2.22.0</commonsIoVersion>
         <commonsCsvVersion>1.14.1</commonsCsvVersion>
-        <jacksonVersion>2.22.0</jacksonVersion>
+        <jacksonVersion>2.22.3</jacksonVersion>
         <jUnitVersion>6.1.3</jUnitVersion>
         <assertJVersion>3.27.7</assertJVersion>
         <jSpecifyVersion>1.0.0</jSpecifyVersion>
