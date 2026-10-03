@@ -33,7 +33,7 @@ import static javafx.event.ActionEvent.ACTION;
 import static org.panteleyev.fx.factories.ButtonFactory.buttonType;
 import static org.panteleyev.fx.factories.MenuFactory.menuItem;
 import static org.panteleyev.fx.factories.TreeTableFactory.treeItem;
-import static org.panteleyev.stamps.desktop.GlobalContext.stampsService;
+import static org.panteleyev.stamps.desktop.StampsService.stampsService;
 import static org.panteleyev.stamps.desktop.ui.MainWindowController.UI;
 import static org.panteleyev.stamps.desktop.util.DtoUtils.ALBUM_COMPARATOR_BY_NAME;
 

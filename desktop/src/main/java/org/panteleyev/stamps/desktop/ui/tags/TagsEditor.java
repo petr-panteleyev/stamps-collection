@@ -24,7 +24,7 @@ import java.util.UUID;
 import static javafx.event.ActionEvent.ACTION;
 import static org.panteleyev.fx.factories.ButtonFactory.buttonType;
 import static org.panteleyev.fx.factories.MenuFactory.menuItem;
-import static org.panteleyev.stamps.desktop.GlobalContext.stampsService;
+import static org.panteleyev.stamps.desktop.StampsService.stampsService;
 import static org.panteleyev.stamps.desktop.ui.MainWindowController.UI;
 
 public class TagsEditor extends BaseDialog<TagEditorResult> {

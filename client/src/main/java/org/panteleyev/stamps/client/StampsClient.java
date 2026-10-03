@@ -3,6 +3,8 @@
 package org.panteleyev.stamps.client;
 
 import org.panteleyev.functional.Either;
+import org.panteleyev.stamps.client.actuator.HealthDTO;
+import org.panteleyev.stamps.client.actuator.HealthStatusDTO;
 import org.panteleyev.stamps.client.openapi.api.AlbumsV1Api;
 import org.panteleyev.stamps.client.openapi.api.BlocksV1Api;
 import org.panteleyev.stamps.client.openapi.api.CouplingsV1Api;
@@ -55,6 +57,8 @@ public class StampsClient {
     private final CouplingsV1Api couplingsV1Api;
     private final AlbumsV1Api albumsV1Api;
 
+    private final ServerManagementApi serverManagementApi;
+
     /**
      * Client builder.
      */
@@ -91,19 +95,21 @@ public class StampsClient {
     }
 
     private StampsClient(String serverUrl, Duration connectTimeout) {
-        var defaultClient = Configuration.getDefaultApiClient();
-        defaultClient.updateBaseUri(serverUrl);
-        defaultClient.setBasePath(CONTEXT_ROOT);
-        defaultClient.setConnectTimeout(connectTimeout);
+        var apiClient = Configuration.getDefaultApiClient();
+        apiClient.updateBaseUri(serverUrl);
+        apiClient.setBasePath(CONTEXT_ROOT);
+        apiClient.setConnectTimeout(connectTimeout);
 
-        imagesV1Api = new ImagesV1Api(defaultClient);
-        regionsV1Api = new RegionsV1Api(defaultClient);
-        tagsV1Api = new TagsV1Api(defaultClient);
-        issuesV1Api = new IssuesV1Api(defaultClient);
-        stampsV1Api = new StampsV1Api(defaultClient);
-        blocksV1Api = new BlocksV1Api(defaultClient);
-        couplingsV1Api = new CouplingsV1Api(defaultClient);
-        albumsV1Api = new AlbumsV1Api(defaultClient);
+        imagesV1Api = new ImagesV1Api(apiClient);
+        regionsV1Api = new RegionsV1Api(apiClient);
+        tagsV1Api = new TagsV1Api(apiClient);
+        issuesV1Api = new IssuesV1Api(apiClient);
+        stampsV1Api = new StampsV1Api(apiClient);
+        blocksV1Api = new BlocksV1Api(apiClient);
+        couplingsV1Api = new CouplingsV1Api(apiClient);
+        albumsV1Api = new AlbumsV1Api(apiClient);
+
+        serverManagementApi = new ServerManagementApi(apiClient);
     }
 
     /* Regions */
@@ -205,6 +211,20 @@ public class StampsClient {
 
     public Either<ClientError, AlbumDTO> putAlbum(AlbumDTO album) {
         return call(() -> albumsV1Api.putAlbum(album.getId(), album));
+    }
+
+    // Server management
+
+    public Either<ClientError, HealthDTO> getHealth() {
+        return call(serverManagementApi::health);
+    }
+
+    public Either<ClientError, HealthStatusDTO> getReadiness() {
+        return call(serverManagementApi::readiness);
+    }
+
+    public Either<ClientError, Void> shutdown() {
+        return callVoid(serverManagementApi::shutdown);
     }
 
     //

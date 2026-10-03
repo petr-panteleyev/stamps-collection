@@ -7,6 +7,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
@@ -56,7 +57,7 @@ import static org.panteleyev.fx.factories.FileChooserFactory.fileChooser;
 import static org.panteleyev.fx.factories.MenuFactory.menu;
 import static org.panteleyev.fx.factories.MenuFactory.menuBar;
 import static org.panteleyev.fx.factories.MenuFactory.menuItem;
-import static org.panteleyev.stamps.desktop.GlobalContext.stampsService;
+import static org.panteleyev.stamps.desktop.StampsService.stampsService;
 import static org.panteleyev.stamps.desktop.settings.Settings.settings;
 import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_ALT_B;
 import static org.panteleyev.stamps.desktop.ui.Shortcuts.SHORTCUT_ALT_C;
@@ -103,6 +104,7 @@ public class MainWindowController extends BaseController {
     private final BooleanProperty tagsEditorEnabled = new SimpleBooleanProperty(false);
     private final BooleanProperty editAlbumsEnabled = new SimpleBooleanProperty(false);
     private final BooleanProperty filterEnabled = new SimpleBooleanProperty(false);
+    private final BooleanProperty shutdownServerEnabled = new SimpleBooleanProperty(false);
 
     // Actions
     private final FxAction newIssueAction = fxAction("Новый выпуск...")
@@ -119,6 +121,8 @@ public class MainWindowController extends BaseController {
             .onAction(this::onEditTags).accelerator(SHORTCUT_ALT_T).disableBinding(tagsEditorEnabled.not());
     private final FxAction filterAction = fxAction("Фильтр...")
             .onAction(this::onFilter).accelerator(SHORTCUT_ALT_F).disableBinding(filterEnabled.not());
+    private final FxAction shutdownServerAction = fxAction("Остановить сервер")
+            .onAction(this::onShutdownServer).disableBinding(shutdownServerEnabled.not());
 
     private final AtomicReference<String> imageDirectory = new AtomicReference<>(null);
 
@@ -190,7 +194,9 @@ public class MainWindowController extends BaseController {
         var serviceMenu = menu("Сервис",
                 editProfilesAction.createMenuItem(),
                 new SeparatorMenuItem(),
-                editTagsAction.createMenuItem()
+                editTagsAction.createMenuItem(),
+                new SeparatorMenuItem(),
+                shutdownServerAction.createMenuItem()
         );
 
         return menuBar(fileMenu, editMenu, viewMenu, albumMenu, serviceMenu,
@@ -212,6 +218,8 @@ public class MainWindowController extends BaseController {
         for (var index = 1; index < albumMenuSize; index++) {
             albumMenu.getItems().removeLast();
         }
+
+        if (!stampsService().connectedProperty().get()) return;
 
         var albums = stampsService().loadAlbums().stream()
                 .sorted(ALBUM_COMPARATOR_BY_NAME)
@@ -378,6 +386,18 @@ public class MainWindowController extends BaseController {
         new AlbumDialog(filter, true).showAndWait().ifPresent(this::onAlbum);
     }
 
+    private void onShutdownServer(ActionEvent ignored) {
+        if (newConfirmationAlert("Вы уверены, что хотите остановить сервер?")
+                .showAndWait().orElse(ButtonType.NO) != ButtonType.YES) return;
+
+        stampsService().shutdownServer();
+        currentAlbum = null;
+        getStage().setTitle(getTitle());
+        view.setIssues(List.of());
+        onSelectedRow(null);
+        buildAlbumMenu();
+    }
+
     private void onProfiles(ActionEvent ignored) {
         profileManager.getEditor().showAndWait();
     }
@@ -388,7 +408,7 @@ public class MainWindowController extends BaseController {
     }
 
     private void open(ConnectionProfile profile) {
-        stampsService().init(profile.serverUrl());
+        stampsService().connect(profile.serverUrl());
         buildAlbumMenu();
         onSelectedRow(null);
     }
@@ -401,6 +421,7 @@ public class MainWindowController extends BaseController {
         tagsEditorEnabled.set(stampsService().connectedProperty().get());
         editAlbumsEnabled.set(stampsService().connectedProperty().get());
         filterEnabled.set(stampsService().connectedProperty().get());
+        shutdownServerEnabled.set(stampsService().connectedProperty().get());
 
         if (!stampsService().connectedProperty().get() || currentAlbum == null) {
             newIssueEnabled.set(false);
@@ -433,5 +454,12 @@ public class MainWindowController extends BaseController {
         var showMissingButton = view.getUnfilteredItems().stream()
                 .anyMatch(i -> !i.getHasClean() && !i.getHasCancelled());
         showMissingRadio.setVisible(showMissingButton);
+    }
+
+    public static Alert newConfirmationAlert(String message) {
+        var alert = new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.YES, ButtonType.NO);
+        alert.setTitle("Подтверждение");
+        alert.setHeaderText("Подтверждение");
+        return alert;
     }
 }

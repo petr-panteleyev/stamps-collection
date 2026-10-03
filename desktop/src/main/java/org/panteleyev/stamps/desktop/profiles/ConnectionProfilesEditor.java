@@ -24,7 +24,9 @@ import org.controlsfx.validation.ValidationResult;
 import org.controlsfx.validation.ValidationSupport;
 import org.panteleyev.fx.BaseDialog;
 import org.panteleyev.fx.ReadOnlyStringConverter;
+import org.panteleyev.stamps.client.StampsClient;
 
+import java.time.Duration;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -38,6 +40,7 @@ import static javafx.scene.control.ButtonType.CLOSE;
 import static javafx.scene.control.ButtonType.OK;
 import static org.panteleyev.fx.factories.ButtonFactory.buttonType;
 import static org.panteleyev.fx.factories.LabelFactory.label;
+import static org.panteleyev.stamps.desktop.settings.Settings.settings;
 import static org.panteleyev.stamps.desktop.ui.Styles.BIG_SPACING;
 import static org.panteleyev.stamps.desktop.ui.Styles.DOUBLE_SPACING;
 
@@ -58,7 +61,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private final ConnectionProfileManager profileManager;
 
     ConnectionProfilesEditor(ConnectionProfileManager profileManager) {
-//        super(settings().getDialogCssFileUrl());
+        super(settings().getDialogCssFilePath());
 
         Objects.requireNonNull(profileManager);
 
@@ -179,12 +182,19 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private void onTestButton(ActionEvent event) {
         event.consume();
 
-        // TODO
+        var client = new StampsClient.Builder()
+                .withServerUrl(connectionEditor.getServerUrl())
+                .withConnectTimeout(Duration.ofSeconds(1))
+                .build();
+
+        client.getHealth()
+                .onLeft(error -> testFail(error.message()))
+                .onRight(_ -> testSuccess());
     }
 
     private void testSuccess() {
         Platform.runLater(() -> {
-            testStatusLabel.setText("Success");
+            testStatusLabel.setText("Успешно");
             testStatusLabel.textFillProperty().set(Color.GREEN);
         });
     }
@@ -209,7 +219,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private void onNewButton(ActionEvent event) {
         event.consume();
 
-        var profile = new ConnectionProfile("New Profile" + (++counter), DEFAULT_SERVER_URL);
+        var profile = new ConnectionProfile("Новый профиль" + (++counter), DEFAULT_SERVER_URL);
         profileListView.getItems().add(profile);
         profileListView.getSelectionModel().select(profile);
     }
@@ -244,7 +254,7 @@ class ConnectionProfilesEditor extends BaseDialog<Object> {
     private VBox initCenterPane() {
         var pane = new VBox();
 
-        var hBox = new HBox(label("Имя профиля:"), profileNameEdit);
+        var hBox = new HBox(label("Название:"), profileNameEdit);
         hBox.setAlignment(Pos.CENTER_LEFT);
 
         var titled = new TitledPane("Соединение", connectionEditor);

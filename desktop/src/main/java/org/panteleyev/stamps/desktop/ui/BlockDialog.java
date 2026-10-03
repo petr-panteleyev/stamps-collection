@@ -21,7 +21,7 @@ import static org.panteleyev.fx.factories.LabelFactory.label;
 import static org.panteleyev.fx.factories.grid.GridCell.gridCell;
 import static org.panteleyev.fx.factories.grid.GridPaneFactory.gridPane;
 import static org.panteleyev.fx.factories.grid.GridRow.gridRow;
-import static org.panteleyev.stamps.desktop.GlobalContext.stampsService;
+import static org.panteleyev.stamps.desktop.StampsService.stampsService;
 import static org.panteleyev.stamps.desktop.settings.Settings.settings;
 import static org.panteleyev.stamps.desktop.ui.MainWindowController.UI;
 import static org.panteleyev.stamps.desktop.ui.Styles.GRID_PANE;

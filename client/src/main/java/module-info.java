@@ -3,6 +3,7 @@
 module stamps.client {
     exports org.panteleyev.stamps.dto;
     exports org.panteleyev.stamps.client;
+    exports org.panteleyev.stamps.client.actuator;
 
     requires java.net.http;
 

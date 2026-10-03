@@ -11,7 +11,7 @@ import org.panteleyev.stamps.desktop.model.CollectionItem;
 import org.panteleyev.stamps.dto.IssueItemDTO;
 import org.panteleyev.stamps.dto.ItemPatchDTO;
 
-import static org.panteleyev.stamps.desktop.GlobalContext.stampsService;
+import static org.panteleyev.stamps.desktop.StampsService.stampsService;
 
 public class ItemCommentCell extends TableCell<CollectionItem, CollectionItem> {
     private final TextField textField = new TextField();

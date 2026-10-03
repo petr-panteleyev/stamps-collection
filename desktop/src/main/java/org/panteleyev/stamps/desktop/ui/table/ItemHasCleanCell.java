@@ -11,7 +11,7 @@ import org.panteleyev.stamps.dto.BlockDTO;
 import org.panteleyev.stamps.dto.IssueItemDTO;
 import org.panteleyev.stamps.dto.ItemPatchDTO;
 
-import static org.panteleyev.stamps.desktop.GlobalContext.stampsService;
+import static org.panteleyev.stamps.desktop.StampsService.stampsService;
 
 public class ItemHasCleanCell extends TableCell<CollectionItem, CollectionItem> {
 

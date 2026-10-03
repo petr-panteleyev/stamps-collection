@@ -33,6 +33,8 @@ import static org.panteleyev.stamps.desktop.converter.TagConverter.modelToDto;
 import static org.panteleyev.stamps.desktop.util.DtoUtils.normalize;
 
 public class StampsService {
+    private static final StampsService stampsService = new StampsService();
+
     private final Lock lock = new ReentrantLock();
 
     private StampsClient client = null;
@@ -41,7 +43,11 @@ public class StampsService {
 
     private final Map<UUID, Image> imageCache = new ConcurrentHashMap<>();
 
-    public void init(String serverUrl) {
+    public static StampsService stampsService() {
+        return stampsService;
+    }
+
+    public void connect(String serverUrl) {
         lock.lock();
         try {
             this.client = new StampsClient.Builder()
@@ -215,6 +221,20 @@ public class StampsService {
             return client.putAlbum(album).onLeft(error -> {
                 throw new RuntimeException(error.toString());
             }).right().orElseThrow();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    // Server management
+
+    public void shutdownServer() {
+        lock.lock();
+        try {
+            client.shutdown().onLeft(error -> {
+                throw new RuntimeException(error.toString());
+            });
+            connectedProperty.set(false);
         } finally {
             lock.unlock();
         }
